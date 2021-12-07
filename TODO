@@ -1,0 +1,7 @@
+☐ make all interface properties `readonly` (unless they need to be mutable)
+☐ explicitly specify return types
+☐ implement a direct renderer to canvas that doesn't go through SVG
+☐ use .prettierrc.yml from our main repo (Ellis already copied it)
+☐ .eslintrc.yml: Ellis coped it here, use it instead of .eslintrc, but merge what you need to from .eslintrc
+☐ mouseover info
+☐ highlight a bar when the mouse is over it
