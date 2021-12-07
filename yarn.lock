@@ -2442,6 +2442,7 @@ __metadata:
     ts-jest: ^27.1.0
     typescript: ^4.5.2
     vite: ^2.6.14
+    vite-dts: ^1.0.3
     vite-tsconfig-paths: ^3.3.17
   languageName: unknown
   linkType: soft
@@ -3802,7 +3803,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0, graceful-fs@npm:^4.2.4, graceful-fs@npm:^4.2.6":
+"graceful-fs@npm:^4.1.15, graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0, graceful-fs@npm:^4.2.4, graceful-fs@npm:^4.2.6":
   version: 4.2.8
   resolution: "graceful-fs@npm:4.2.8"
   checksum: 5d224c8969ad0581d551dfabdb06882706b31af2561bd5e2034b4097e67cc27d05232849b8643866585fd0a41c7af152950f8776f4dd5579e9853733f31461c6
@@ -5108,6 +5109,18 @@ __metadata:
     enquirer:
       optional: true
   checksum: c20203060b2deb441d547d753b63fec53d7fe1455f2bce60926ce941a730413455178038abe37f2cdbf490002778d284585d247c39a30cc3c5b08b7151d85386
+  languageName: node
+  linkType: hard
+
+"load-json-file@npm:^6.2.0":
+  version: 6.2.0
+  resolution: "load-json-file@npm:6.2.0"
+  dependencies:
+    graceful-fs: ^4.1.15
+    parse-json: ^5.0.0
+    strip-bom: ^4.0.0
+    type-fest: ^0.6.0
+  checksum: 4429e430ebb99375fc7cd936348e4f7ba729486080ced4272091c1e386a7f5f738ea3337d8ffd4b01c2f5bc3ddde92f2c780045b66838fe98bdb79f901884643
   languageName: node
   linkType: hard
 
@@ -7228,6 +7241,17 @@ __metadata:
     spdx-correct: ^3.0.0
     spdx-expression-parse: ^3.0.0
   checksum: 35703ac889d419cf2aceef63daeadbe4e77227c39ab6287eeb6c1b36a746b364f50ba22e88591f5d017bc54685d8137bc2d328d0a896e4d3fd22093c0f32a9ad
+  languageName: node
+  linkType: hard
+
+"vite-dts@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "vite-dts@npm:1.0.3"
+  dependencies:
+    load-json-file: ^6.2.0
+  peerDependencies:
+    vite: ">2.0.0-0"
+  checksum: ee95c63f1e44f42b2e792642240cda2dff38edcb3e7e389d9d5aca82514cfebc84337cb1b4b0a178fc6a9d160e7206dbb472f1b93e591ba4d4b7b7952ea7877e
   languageName: node
   linkType: hard
 
