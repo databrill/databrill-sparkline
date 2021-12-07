@@ -16,6 +16,7 @@
       "always",
       [
         "components",
+        "lib",
         "tests"
       ]
     ]
