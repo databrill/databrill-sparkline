@@ -1,5 +1,4 @@
-import createBarChart from "lib/createBarChart";
-import drawImage from "lib/drawImage";
+import { setup } from "lib/canvas";
 import { memo, useEffect, useRef } from "react";
 
 export interface BarChartProps {
@@ -12,22 +11,32 @@ export interface BarChartProps {
 }
 
 export const BarChart = memo(
-	({ barWidth = 20, className, color, gap = 0, size, values }: BarChartProps): JSX.Element => {
+	({
+		barWidth = 20,
+		className,
+		color = "black",
+		gap = 0,
+		size,
+		values,
+	}: BarChartProps): JSX.Element => {
 		const height = size;
 		const width = (values.length - 1) * (barWidth + gap) + barWidth;
 		const ref = useRef<HTMLCanvasElement>(null);
 
 		useEffect(() => {
-			const component = createBarChart({ barWidth, color, gap, height, values, width });
-			const container = ref.current;
-			const context = container?.getContext("2d");
-
-			if (component && container && context) {
-				context.clearRect(0, 0, container.width, container.height);
-				drawImage({ component, container });
+			if (ref.current) {
+				setup({
+					canvas: ref.current,
+					gap,
+					height,
+					itemColor: color,
+					items: values,
+					itemWidth: barWidth,
+					width,
+				});
 			}
 		}, [barWidth, color, gap, height, size, values, width]);
 
-		return <canvas className={className} height={height} ref={ref} width={width} />;
+		return <canvas className={className} ref={ref} />;
 	}
 );
