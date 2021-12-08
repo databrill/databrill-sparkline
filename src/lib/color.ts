@@ -1,6 +1,6 @@
 export const isValid = (value: string): boolean => {
-	const s = new Option().style;
-	s.color = value;
+	const style = new Option().style;
+	style.color = value;
 
-	return s.color !== "";
+	return style.color !== "";
 };
