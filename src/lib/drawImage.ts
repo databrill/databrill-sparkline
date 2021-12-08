@@ -1,7 +1,7 @@
-export type Props = {
+export interface Props {
   component: SVGSVGElement;
   container: HTMLCanvasElement;
-};
+}
 
 const drawImage = ({ component, container }: Props) => {
   const xdocument = document.implementation.createDocument('http://www.w3.org/1999/xhtml', 'html');

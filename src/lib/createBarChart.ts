@@ -1,13 +1,13 @@
 import isColor from './isColor';
 
-type Props = {
+interface Props {
   barWidth: number;
   color?: string;
   gap: number;
   height: number;
   values: number[];
   width: number;
-};
+}
 
 const createBarChart = ({ barWidth, color = 'black', gap, height, values, width }: Props) => {
   if (barWidth < 1) barWidth = 1;

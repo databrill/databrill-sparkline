@@ -2,14 +2,14 @@ import createBarChart from 'lib/createBarChart';
 import drawImage from 'lib/drawImage';
 import { memo, useEffect, useRef } from 'react';
 
-export type BarChartProps = {
+export interface BarChartProps {
   barWidth?: number;
   className?: string;
   color?: string;
   gap?: number;
   size: number;
   values: number[];
-};
+}
 
 export const BarChart = memo(
   ({ barWidth = 20, className, color, gap = 0, size, values }: BarChartProps) => {
