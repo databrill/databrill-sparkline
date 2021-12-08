@@ -45,9 +45,7 @@
 		"vite-tsconfig-paths": "^3.3.17"
 	},
 	"packageManager": "yarn@3.1.1",
-	"files": [
-		"dist"
-	],
+	"files": ["dist"],
 	"main": "./dist/databrill-sparkline.umd.js",
 	"module": "./dist/databrill-sparkline.es.js",
 	"exports": {
