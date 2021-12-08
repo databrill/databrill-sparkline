@@ -9,7 +9,14 @@ interface Props {
 	readonly width: number;
 }
 
-const createBarChart = ({ barWidth, color = "black", gap, height, values, width }: Props) => {
+const createBarChart = ({
+	barWidth,
+	color = "black",
+	gap,
+	height,
+	values,
+	width,
+}: Props): SVGSVGElement | null => {
 	if (barWidth < 1) barWidth = 1;
 	if (!isColor(color)) color = "black";
 	if (gap < 0) gap = 0;

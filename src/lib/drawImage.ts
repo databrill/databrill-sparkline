@@ -3,7 +3,7 @@ export interface Props {
 	readonly container: HTMLCanvasElement;
 }
 
-const drawImage = ({ component, container }: Props) => {
+const drawImage = ({ component, container }: Props): void => {
 	const xdocument = document.implementation.createDocument(
 		"http://www.w3.org/1999/xhtml",
 		"html"

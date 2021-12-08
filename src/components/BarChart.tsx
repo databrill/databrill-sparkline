@@ -12,7 +12,7 @@ export interface BarChartProps {
 }
 
 export const BarChart = memo(
-	({ barWidth = 20, className, color, gap = 0, size, values }: BarChartProps) => {
+	({ barWidth = 20, className, color, gap = 0, size, values }: BarChartProps): JSX.Element => {
 		const height = size;
 		const width = (values.length - 1) * (barWidth + gap) + barWidth;
 		const ref = useRef<HTMLCanvasElement>(null);
