@@ -1,12 +1,12 @@
 import isColor from "./isColor";
 
 interface Props {
-	barWidth: number;
-	color?: string;
-	gap: number;
-	height: number;
-	values: number[];
-	width: number;
+	readonly barWidth: number;
+	readonly color?: string;
+	readonly gap: number;
+	readonly height: number;
+	readonly values: readonly number[];
+	readonly width: number;
 }
 
 const createBarChart = ({ barWidth, color = "black", gap, height, values, width }: Props) => {

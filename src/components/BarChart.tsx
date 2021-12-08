@@ -3,12 +3,12 @@ import drawImage from "lib/drawImage";
 import { memo, useEffect, useRef } from "react";
 
 export interface BarChartProps {
-	barWidth?: number;
-	className?: string;
-	color?: string;
-	gap?: number;
-	size: number;
-	values: number[];
+	readonly barWidth?: number;
+	readonly className?: string;
+	readonly color?: string;
+	readonly gap?: number;
+	readonly size: number;
+	readonly values: readonly number[];
 }
 
 export const BarChart = memo(

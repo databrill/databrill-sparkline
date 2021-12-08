@@ -1,6 +1,6 @@
 export interface Props {
-	component: SVGSVGElement;
-	container: HTMLCanvasElement;
+	readonly component: SVGSVGElement;
+	readonly container: HTMLCanvasElement;
 }
 
 const drawImage = ({ component, container }: Props) => {
