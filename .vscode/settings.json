@@ -1,6 +1,6 @@
 {
-  "files.associations": {
-    ".commitlintrc": "json",
-    ".lintstagedrc": "json"
-  }
+	"files.associations": {
+		".commitlintrc": "json",
+		".lintstagedrc": "json"
+	},
 }

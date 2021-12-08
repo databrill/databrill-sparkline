@@ -1,8 +1,8 @@
 const isColor = (value: string) => {
-  const s = new Option().style;
-  s.color = value;
+	const s = new Option().style;
+	s.color = value;
 
-  return s.color !== '';
+	return s.color !== "";
 };
 
 export default isColor;
