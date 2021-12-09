@@ -1,3 +1,4 @@
+import useDebounceCallback from "hooks/useDebounceCallback";
 import { draw, setup } from "lib/canvas";
 import { isValid } from "lib/color";
 import { memo, MouseEvent, useCallback, useEffect, useMemo, useRef } from "react";
@@ -53,7 +54,7 @@ export const BarChart = memo(
 			});
 		}, [barWidth, color, gap, height, values]);
 
-		const handleMouseMove = useCallback(
+		const handleMouseMove = useDebounceCallback(
 			(event: MouseEvent<HTMLCanvasElement>): void => {
 				const canvas = ref.current;
 				const bound = canvas?.getBoundingClientRect();
@@ -69,8 +70,9 @@ export const BarChart = memo(
 		);
 
 		const handleMouseOut = useCallback(() => {
+			handleMouseMove.cancel();
 			items.forEach((item) => draw({ ...item, canvas: ref.current }));
-		}, [items]);
+		}, [handleMouseMove, items]);
 
 		useEffect(() => {
 			setup({ canvas: ref.current, height, width });

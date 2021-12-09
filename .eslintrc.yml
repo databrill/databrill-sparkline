@@ -27,15 +27,16 @@ extends:
   - plugin:react-hooks/recommended
   - plugin:testing-library/dom
 rules:
+  "@typescript-eslint/no-explicit-any": off
+  "@typescript-eslint/no-inferrable-types": off
+  "@typescript-eslint/no-unused-vars": off
+  "@typescript-eslint/no-var-requires": off
   linebreak-style:
     - error
     - unix
   react/display-name: off
   react/react-in-jsx-scope: off
-  "@typescript-eslint/no-explicit-any": off
-  "@typescript-eslint/no-inferrable-types": off
-  "@typescript-eslint/no-unused-vars": off
-  "@typescript-eslint/no-var-requires": off
+  "react-hooks/exhaustive-deps": ["warn", { additionalHooks: useDebounceCallback }]
   prettier/prettier: error
 settings:
   react:
