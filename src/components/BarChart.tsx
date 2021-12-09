@@ -56,14 +56,16 @@ export const BarChart = memo(
 		const handleMouseMove = useCallback(
 			(event: MouseEvent<HTMLCanvasElement>): void => {
 				const canvas = ref.current;
-				const x = event.clientX;
+				const bound = canvas?.getBoundingClientRect();
+				const x = event.clientX - (bound?.left ?? 0) - (canvas?.clientLeft ?? 0);
+				const y = event.clientY - (bound?.top ?? 0) - (canvas?.clientTop ?? 0);
 
-				items.forEach((item, index) => {
-					const current = x >= item.x && x <= item.x + item.width + gap * index;
+				items.forEach((item) => {
+					const current = x >= item.x && x <= item.x + item.width;
 					draw({ ...item, canvas, color: current ? highlightColor : item.color });
 				});
 			},
-			[gap, highlightColor, items]
+			[highlightColor, items]
 		);
 
 		const handleMouseOut = useCallback(() => {
