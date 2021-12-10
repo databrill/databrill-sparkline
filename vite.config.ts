@@ -1,6 +1,5 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import dts from "vite-dts";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 import path from "path";
@@ -17,9 +16,10 @@ export default defineConfig({
 			output: {
 				globals: {
 					react: "React",
+					"react-dom": "ReactDOM",
 				},
 			},
 		},
 	},
-	plugins: [dts(), react(), tsconfigPaths()],
+	plugins: [react(), tsconfigPaths()],
 });
