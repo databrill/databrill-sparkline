@@ -1,6 +1,6 @@
 import { isValid } from "../color";
 
-describe("isColor", () => {
+describe("color", () => {
 	it("must validate colors", () => {
 		expect(isValid("")).toBeFalsy();
 		expect(isValid("unknown")).toBeFalsy();
