@@ -1,7 +1,8 @@
 import useDebounceCallback from "hooks/useDebounceCallback";
 import { draw, setup } from "lib/canvas";
 import { isValid } from "lib/color";
-import { memo, MouseEvent, useCallback, useEffect, useMemo, useRef } from "react";
+import { memo, MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Tooltip, TooltipProps } from "./Tooltip";
 
 export interface BarChartProps {
 	readonly barWidth?: number;
@@ -25,6 +26,7 @@ export const BarChart = memo(
 		size,
 		values,
 	}: BarChartProps): JSX.Element => {
+		const [tooltip, setTooltip] = useState<TooltipProps | null>(null);
 		const height = size;
 		const width = (values.length - 1) * (barWidth + gap) + barWidth;
 		const ref = useRef<HTMLCanvasElement>(null);
@@ -60,10 +62,15 @@ export const BarChart = memo(
 				const bound = canvas?.getBoundingClientRect();
 				const x = event.clientX - (bound?.left ?? 0) - (canvas?.clientLeft ?? 0);
 				const y = event.clientY - (bound?.top ?? 0) - (canvas?.clientTop ?? 0);
+				const current = items.find((item) => x >= item.x && x <= item.x + item.width);
+
+				if (current)
+					setTooltip({ hidden: false, left: x + 8, top: y - 16, value: current?.value });
+				else setTooltip(null);
 
 				items.forEach((item) => {
-					const current = x >= item.x && x <= item.x + item.width;
-					draw({ ...item, canvas, color: current ? highlightColor : item.color });
+					const active = current?.x === item.x;
+					draw({ ...item, canvas, color: active ? highlightColor : item.color });
 				});
 			},
 			[highlightColor, items]
@@ -72,6 +79,7 @@ export const BarChart = memo(
 		const handleMouseOut = useCallback(() => {
 			handleMouseMove.cancel();
 			items.forEach((item) => draw({ ...item, canvas: ref.current }));
+			setTooltip(null);
 		}, [handleMouseMove, items]);
 
 		useEffect(() => {
@@ -83,12 +91,10 @@ export const BarChart = memo(
 		}, [height, items, width]);
 
 		return (
-			<canvas
-				className={className}
-				onMouseMove={handleMouseMove}
-				onMouseOut={handleMouseOut}
-				ref={ref}
-			/>
+			<div className={className} style={{ display: "inline-block", position: "relative" }}>
+				<canvas onMouseMove={handleMouseMove} onMouseOut={handleMouseOut} ref={ref} />
+				<Tooltip {...tooltip} />
+			</div>
 		);
 	}
 );

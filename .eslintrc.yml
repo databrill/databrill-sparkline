@@ -34,11 +34,12 @@ rules:
   linebreak-style:
     - error
     - unix
+  prefer-spread: off
+  prettier/prettier: error
   react/display-name: off
   react/prop-types: off
   react/react-in-jsx-scope: off
   react-hooks/exhaustive-deps: [warn, { additionalHooks: useDebounceCallback }]
-  prettier/prettier: error
 settings:
   react:
     version: detect

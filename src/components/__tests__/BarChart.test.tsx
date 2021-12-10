@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { BarChart } from "..";
+import { BarChart } from "../BarChart";
 
 describe("BarChart", () => {
 	it("must accept custom classes", () => {
