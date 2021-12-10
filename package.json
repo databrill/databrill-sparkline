@@ -3,8 +3,9 @@
 	"version": "1.0.0",
 	"scripts": {
 		"build": "vite build && tsc -p tsconfig.production.json",
+		"dev": "vite",
 		"lint": "tsc && eslint ./src/**/*.ts{,x} --fix",
-		"setup": "rimraf .husky && husky install && husky add .husky/pre-commit \"yarn lint-staged\" && husky add .husky/commit-msg 'npx --no -- commitlint --edit \"$1\"' && husky add .husky/pre-push \"yarn test\"",
+		"setup": "sh ./scripts/setup.sh",
 		"test": "jest"
 	},
 	"dependencies": {

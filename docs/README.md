@@ -10,6 +10,12 @@ Removes `dist` directory and generates a new bundle.
 
 <br/>
 
+### `yarn dev`
+
+Runs the project in development mode.
+
+<br/>
+
 ### `yarn lint`
 
 Checks code and types.
