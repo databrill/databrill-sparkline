@@ -16,6 +16,7 @@
 			"always",
 			[
 				"components",
+				"docs",
 				"lib",
 				"tests"
 			]
