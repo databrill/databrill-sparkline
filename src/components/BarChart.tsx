@@ -39,7 +39,7 @@ export const BarChart = memo(
 			const range = Math.abs(max) + Math.abs(min);
 
 			return values.map((value, index) => {
-				const itemHeight = (Math.abs(value) * height) / range;
+				const itemHeight = Math.round((Math.abs(value) * height) / range);
 				const itemWidth = barWidth;
 
 				return {
@@ -48,10 +48,11 @@ export const BarChart = memo(
 					value,
 					width: itemWidth,
 					x: index === 0 ? index * itemWidth : index * (itemGap + itemWidth),
-					y:
+					y: Math.round(
 						value > 0
 							? (Math.abs(min) * height) / range
-							: (Math.abs(min) * height) / range - itemHeight,
+							: (Math.abs(min) * height) / range - itemHeight
+					),
 				};
 			});
 		}, [barWidth, color, gap, height, values]);
