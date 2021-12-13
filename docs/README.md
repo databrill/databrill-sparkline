@@ -14,6 +14,10 @@ Runs the project in development mode.
 
 Checks code and types.
 
+### `yarn setup`
+
+Sets up development environment.
+
 ### `yarn test`
 
 Executes tests.
