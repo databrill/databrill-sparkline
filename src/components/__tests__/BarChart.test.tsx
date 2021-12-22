@@ -3,11 +3,10 @@ import { BarChart } from "../BarChart";
 
 describe("BarChart", () => {
 	it("must accept custom classes", () => {
-		const { container } = render(
-			<BarChart className="jest" size={200} values={[0, 1, 2, 3]} />
-		);
-		const component = container.getElementsByClassName("jest")[0];
+		const className = "jest";
+		const { container } = render(<BarChart className={className} size={64} values={[]} />);
+		const component = container.getElementsByClassName(className)[0];
 
-		expect(component?.classList).toContain("jest");
+		expect(component).toBeInTheDocument();
 	});
 });
