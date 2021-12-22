@@ -1,4 +1,12 @@
-interface DrawProps {
+interface DrawCircleProps {
+	readonly canvas: HTMLCanvasElement | null;
+	readonly color: string;
+	readonly x: number;
+	readonly y: number;
+	readonly size: number;
+}
+
+interface DrawRectangleProps {
 	readonly canvas: HTMLCanvasElement | null;
 	readonly color: string;
 	readonly height: number;
@@ -13,7 +21,20 @@ interface SetupProps {
 	readonly width: number;
 }
 
-export const draw = (props: DrawProps): void => {
+export const drawCircle = (props: DrawCircleProps): void => {
+	const { canvas, color, size, x, y } = props;
+	const context = canvas?.getContext("2d");
+
+	if (!(canvas && context)) return;
+
+	context.save();
+	context.fillStyle = color;
+	context.clearRect(x, y, size, size);
+	context.arc(x, y, size / 2, 0, 2 * Math.PI, false);
+	context.restore();
+};
+
+export const drawRectangle = (props: DrawRectangleProps): void => {
 	const { canvas, color, height, x, y, width } = props;
 	const context = canvas?.getContext("2d");
 

@@ -1,5 +1,5 @@
 import useDebounceCallback from "hooks/useDebounceCallback";
-import { draw, setup } from "lib/canvas";
+import { drawRectangle, setup } from "lib/canvas";
 import { isValid } from "lib/color";
 import { memo, MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Tooltip, TooltipProps } from "./Tooltip";
@@ -71,7 +71,7 @@ export const BarChart = memo(
 
 				items.forEach((item) => {
 					const active = current?.x === item.x;
-					draw({ ...item, canvas, color: active ? highlightColor : item.color });
+					drawRectangle({ ...item, canvas, color: active ? highlightColor : item.color });
 				});
 			},
 			[highlightColor, items]
@@ -79,7 +79,7 @@ export const BarChart = memo(
 
 		const handleMouseOut = useCallback(() => {
 			handleMouseMove.cancel();
-			items.forEach((item) => draw({ ...item, canvas: ref.current }));
+			items.forEach((item) => drawRectangle({ ...item, canvas: ref.current }));
 			setTooltip(null);
 		}, [handleMouseMove, items]);
 
@@ -88,11 +88,11 @@ export const BarChart = memo(
 		}, [height, width]);
 
 		useEffect(() => {
-			items.forEach((item) => draw({ ...item, canvas: ref.current }));
-		}, [height, items, width]);
+			items.forEach((item) => drawRectangle({ ...item, canvas: ref.current }));
+		}, [items]);
 
 		return (
-			<div className={className} style={{ display: "inline-block", position: "relative" }}>
+			<div className={className} style={{ display: "inline-flex", position: "relative" }}>
 				<canvas onMouseMove={handleMouseMove} onMouseOut={handleMouseOut} ref={ref} />
 				<Tooltip {...tooltip} />
 			</div>
