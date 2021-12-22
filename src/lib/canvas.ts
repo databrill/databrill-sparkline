@@ -29,8 +29,8 @@ export const drawCircle = (props: DrawCircleProps): void => {
 
 	context.save();
 	context.fillStyle = color;
-	context.clearRect(x, y, size, size);
 	context.arc(x, y, size / 2, 0, 2 * Math.PI, false);
+	context.fill();
 	context.restore();
 };
 
@@ -42,8 +42,8 @@ export const drawRectangle = (props: DrawRectangleProps): void => {
 
 	context.save();
 	context.fillStyle = color;
-	context.clearRect(x, y, width, height);
-	context.fillRect(x, y, width, height);
+	context.rect(x, y, width, height);
+	context.fill();
 	context.restore();
 };
 
