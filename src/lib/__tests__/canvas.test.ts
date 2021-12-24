@@ -1,4 +1,11 @@
-import { drawCircle, drawRectangle, setup } from "lib/canvas";
+import {
+	drawCircle,
+	drawLine,
+	drawRectangle,
+	drawRectangleOutline,
+	drawText,
+	setup,
+} from "lib/canvas";
 
 describe("canvas", () => {
 	it("must setup size", () => {
@@ -20,7 +27,20 @@ describe("canvas", () => {
 
 		setup({ canvas: blank, height, width });
 		setup({ canvas, height, width });
-		drawCircle({ canvas, color: "black", size: 4, x: 0, y: 0 });
+		drawCircle({ canvas, size: 4, x: 0, y: 0 });
+
+		expect(canvas.toDataURL()).not.toBe(blank.toDataURL());
+	});
+
+	it("must draw a line", () => {
+		const blank = document.createElement("canvas");
+		const canvas = document.createElement("canvas");
+		const height = 50;
+		const width = 92;
+
+		setup({ canvas: blank, height, width });
+		setup({ canvas, height, width });
+		drawLine({ canvas, fromX: 10, fromY: 10, toX: 20, toY: 20 });
 
 		expect(canvas.toDataURL()).not.toBe(blank.toDataURL());
 	});
@@ -33,7 +53,33 @@ describe("canvas", () => {
 
 		setup({ canvas: blank, height, width });
 		setup({ canvas, height, width });
-		drawRectangle({ canvas, color: "black", height: 4, width: 4, x: 0, y: 0 });
+		drawRectangle({ canvas, height: 4, width: 4, x: 0, y: 0 });
+
+		expect(canvas.toDataURL()).not.toBe(blank.toDataURL());
+	});
+
+	it("must draw a rectangle outline", () => {
+		const blank = document.createElement("canvas");
+		const canvas = document.createElement("canvas");
+		const height = 50;
+		const width = 92;
+
+		setup({ canvas: blank, height, width });
+		setup({ canvas, height, width });
+		drawRectangleOutline({ canvas, height: 4, width: 4, x: 0, y: 0 });
+
+		expect(canvas.toDataURL()).not.toBe(blank.toDataURL());
+	});
+
+	it("must draw a text", () => {
+		const blank = document.createElement("canvas");
+		const canvas = document.createElement("canvas");
+		const height = 50;
+		const width = 92;
+
+		setup({ canvas: blank, height, width });
+		setup({ canvas, height, width });
+		drawText({ canvas, value: "Jest", x: 10, y: 10 });
 
 		expect(canvas.toDataURL()).not.toBe(blank.toDataURL());
 	});
