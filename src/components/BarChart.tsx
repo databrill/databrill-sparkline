@@ -4,6 +4,8 @@ import { isValid } from "lib/color";
 import { memo, MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Tooltip, TooltipProps } from "./Tooltip";
 
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
+
 export interface BarChartProps {
 	readonly barWidth?: number;
 	readonly className?: string;
@@ -13,8 +15,6 @@ export interface BarChartProps {
 	readonly size: number;
 	readonly values: readonly number[];
 }
-
-/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 
 export const BarChart = memo(
 	({
