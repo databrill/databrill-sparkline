@@ -1,11 +1,4 @@
-import {
-	drawCircle,
-	drawLine,
-	drawRectangle,
-	drawRectangleOutline,
-	drawText,
-	setup,
-} from "lib/canvas";
+import { drawCircle, drawLine, drawRectangleOutline, drawText, setup } from "lib/canvas";
 import { isValid } from "lib/color";
 import { memo, useEffect, useMemo, useRef } from "react";
 
@@ -14,12 +7,23 @@ export interface ScatterPlotProps {
 	readonly dotColor?: string;
 	readonly dotSize?: number;
 	readonly size: number;
+	readonly stepX?: number;
+	readonly stepY?: number;
 	readonly x: number[];
 	readonly y: number[];
 }
 
 export const ScatterPlot = memo(
-	({ className, dotColor = "black", dotSize = 8, size, x, y }: ScatterPlotProps): JSX.Element => {
+	({
+		className,
+		dotColor = "black",
+		dotSize = 8,
+		size,
+		stepX,
+		stepY,
+		x,
+		y,
+	}: ScatterPlotProps): JSX.Element => {
 		const fontSize = 12;
 		const itemSize = Math.round(dotSize);
 		const gap = 24;
@@ -33,15 +37,17 @@ export const ScatterPlot = memo(
 
 		const items = useMemo(() => {
 			const itemColor = isValid(dotColor) ? dotColor : "black";
-			const position = size - gap - itemSize * 2;
+			const position = size - gap - itemSize * 2 - 2;
+			const rangeX = maxX + -minX;
+			const rangeY = maxY + -minY;
 
 			return x.map((value, index) => ({
 				color: itemColor,
 				size: itemSize,
-				x: Math.round((value * position) / maxX) + gap + itemSize,
-				y: Math.round(((y[index] ?? 0) * position) / maxY) + gap + itemSize,
+				x: Math.round(((value + -minX) * position) / rangeX) + gap + itemSize,
+				y: Math.round((((y[index] ?? 0) + -minY) * position) / rangeY) + gap + itemSize,
 			}));
-		}, [dotColor, itemSize, maxX, maxY, size, x, y]);
+		}, [dotColor, itemSize, maxX, maxY, minX, minY, size, x, y]);
 
 		useEffect(() => {
 			const canvas = ref.current;
@@ -61,34 +67,43 @@ export const ScatterPlot = memo(
 
 		useEffect(() => {
 			const canvas = ref.current;
-			const lines = Array(4).fill(undefined);
-			const lineGapX = (plotWidth - itemSize * 2) / (lines.length - 1);
-			const lineGapY = (plotHeight - itemSize * 2) / (lines.length - 1);
+			const defaultSliceX = maxX / 3;
+			const defaultSliceY = maxY / 3;
+			const linesX = Array(Math.round(maxX / (stepX ?? defaultSliceX))).fill(null);
+			const linesY = Array(Math.round(maxY / (stepY ?? defaultSliceY))).fill(null);
+			const lineGapX = (plotWidth - itemSize * 2) / linesX.length;
+			const lineGapY = (plotHeight - itemSize * 2) / linesY.length;
+			const rangeX = [
+				minX,
+				...linesX.map((_, index) => minX + (stepX ?? defaultSliceX) * (index + 1)),
+			];
+			const rangeY = [
+				minY,
+				...linesY.map((_, index) => minY + (stepY ?? defaultSliceY) * (index + 1)),
+			];
 
-			lines.forEach((_, index) => {
+			rangeX.forEach((item, index) => {
 				const fromX = gap + index * lineGapX + itemSize;
 				const fromY = gap;
-				const range = [minX, ((maxX - minX) / 4) * 2, ((maxX - minX) / 4) * 3, maxX];
 				const toX = gap + index * lineGapX + itemSize;
-				const toY = gap - gap / lines.length;
-				const value = `${range[index]}`;
+				const toY = gap - 8;
+				const value = `${item}`;
 
 				drawLine({ canvas, fromX, fromY, toX, toY });
 				drawText({ align: "center", canvas, value, x: toX, y: toY - fontSize - 4 });
 			});
 
-			lines.forEach((_, index) => {
+			rangeY.forEach((item, index) => {
 				const fromX = gap;
 				const fromY = gap + index * lineGapY + itemSize;
-				const range = [minY, ((maxY - minY) / 4) * 2, ((maxY - minY) / 4) * 3, maxY];
-				const toX = gap - gap / lines.length;
+				const toX = gap - 8;
 				const toY = gap + index * lineGapY + itemSize;
-				const value = `${range[index]}`;
+				const value = `${item}`;
 
 				drawLine({ canvas, fromX, fromY, toX, toY });
-				drawText({ align: "right", canvas, value, x: toX - 4, y: toY - fontSize / 2 });
+				drawText({ align: "right", canvas, value, x: toX, y: toY - fontSize / 2 });
 			});
-		}, [itemSize, maxX, maxY, minX, minY, plotHeight, plotWidth]);
+		}, [itemSize, maxX, maxY, minX, minY, plotHeight, plotWidth, stepX, stepY]);
 
 		useEffect(() => {
 			items.forEach((item) => drawCircle({ ...item, canvas: ref.current }));
