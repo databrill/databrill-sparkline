@@ -36,7 +36,7 @@ export const BarChart = memo(
 			const itemGap = gap > 0 ? gap : 0;
 			const max = Math.max(...values);
 			const min = Math.min(...values);
-			const range = Math.abs(max) + Math.abs(min);
+			const range = max + -min;
 
 			return values.map((value, index) => {
 				const itemHeight = Math.round((Math.abs(value) * height) / range);
@@ -47,7 +47,7 @@ export const BarChart = memo(
 					height: itemHeight,
 					value,
 					width: itemWidth,
-					x: index === 0 ? index * itemWidth : index * (itemGap + itemWidth),
+					x: index * (itemGap + itemWidth),
 					y: Math.round(
 						value > 0
 							? (Math.abs(min) * height) / range
