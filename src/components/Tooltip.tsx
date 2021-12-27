@@ -4,7 +4,7 @@ export interface TooltipProps {
 	hidden?: boolean;
 	left?: number;
 	top?: number;
-	value?: number;
+	value?: number | string;
 }
 
 export const Tooltip = memo(
