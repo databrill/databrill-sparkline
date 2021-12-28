@@ -94,7 +94,12 @@ export const BarChart = memo(
 		return (
 			<div className={className} style={{ display: "inline-flex", position: "relative" }}>
 				<canvas onMouseMove={handleMouseMove} onMouseOut={handleMouseOut} ref={ref} />
-				<Tooltip {...tooltip} />
+				<Tooltip
+					hidden={tooltip?.hidden}
+					left={tooltip?.left}
+					top={tooltip?.top}
+					value={tooltip?.value}
+				/>
 			</div>
 		);
 	}
