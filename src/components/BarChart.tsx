@@ -1,6 +1,5 @@
 import useDebounceCallback from "hooks/useDebounceCallback";
 import { drawRectangle, setup } from "lib/canvas";
-import { isValid } from "lib/color";
 import { memo, MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Tooltip, TooltipProps } from "./Tooltip";
 
@@ -32,7 +31,6 @@ export const BarChart = memo(
 		const ref = useRef<HTMLCanvasElement>(null);
 
 		const items = useMemo(() => {
-			const itemColor = isValid(color) ? color : "black";
 			const itemGap = gap > 0 ? gap : 0;
 			const max = Math.max(...values);
 			const min = Math.min(...values);
@@ -43,7 +41,7 @@ export const BarChart = memo(
 				const itemWidth = barWidth;
 
 				return {
-					color: itemColor,
+					color,
 					height: itemHeight,
 					value,
 					width: itemWidth,

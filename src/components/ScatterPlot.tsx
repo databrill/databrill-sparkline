@@ -1,6 +1,5 @@
 import useDebounceCallback from "hooks/useDebounceCallback";
 import { drawCircle, drawLine, drawRectangleOutline, drawText, setup } from "lib/canvas";
-import { isValid } from "lib/color";
 import { memo, MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Tooltip, TooltipProps } from "./Tooltip";
 
@@ -14,8 +13,8 @@ export interface ScatterPlotProps {
 	readonly size: number;
 	readonly stepX?: number;
 	readonly stepY?: number;
-	readonly x: number[];
-	readonly y: number[];
+	readonly x: readonly number[];
+	readonly y: readonly number[];
 }
 
 export const ScatterPlot = memo(
@@ -43,13 +42,12 @@ export const ScatterPlot = memo(
 		const [tooltip, setTooltip] = useState<TooltipProps | null>(null);
 
 		const items = useMemo(() => {
-			const itemColor = isValid(dotColor) ? dotColor : "black";
 			const position = size - gap - itemSize * 2 - 2;
 			const rangeX = maxX + -minX;
 			const rangeY = maxY + -minY;
 
 			return x.map((value, index) => ({
-				color: itemColor,
+				color: dotColor,
 				size: itemSize,
 				x: Math.round(((value + -minX) * position) / rangeX) + gap + itemSize,
 				y: Math.round((((y[index] ?? 0) + -minY) * position) / rangeY) + gap + itemSize,
