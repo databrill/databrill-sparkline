@@ -33,6 +33,14 @@ interface DrawTextProps {
 	readonly y: number;
 }
 
+interface RenderBarChartProps {
+	readonly barWidth?: number;
+	readonly color?: string;
+	readonly gap?: number;
+	readonly size: number;
+	readonly values: readonly number[];
+}
+
 interface SetupProps {
 	readonly canvas: HTMLCanvasElement | null;
 	readonly height: number;
@@ -118,4 +126,37 @@ export const setup = (props: SetupProps): void => {
 	canvas.width = width;
 	context.translate(0, height);
 	context.scale(1, -1);
+};
+
+export const renderBarChart = (props: RenderBarChartProps): HTMLCanvasElement => {
+	const { barWidth = 8, color = "black", gap = 0, size, values } = props;
+	const canvas = document.createElement("canvas");
+	const height = size;
+	const width = (values.length - 1) * (barWidth + gap) + barWidth;
+	const max = Math.max(...values);
+	const min = Math.min(...values);
+	const range = max + -min;
+
+	setup({ canvas, height, width });
+
+	const items = values.map((value, index) => {
+		const itemHeight = Math.round((Math.abs(value) * height) / range);
+
+		return {
+			color,
+			height: itemHeight,
+			value,
+			width: barWidth,
+			x: index * (barWidth + gap),
+			y: Math.round(
+				value > 0
+					? (Math.abs(min) * height) / range
+					: (Math.abs(min) * height) / range - itemHeight
+			),
+		};
+	});
+
+	items.forEach((item) => drawRectangle({ ...item, canvas }));
+
+	return canvas;
 };

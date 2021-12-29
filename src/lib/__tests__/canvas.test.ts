@@ -4,6 +4,7 @@ import {
 	drawRectangle,
 	drawRectangleOutline,
 	drawText,
+	renderBarChart,
 	setup,
 } from "lib/canvas";
 
@@ -82,5 +83,11 @@ describe("canvas", () => {
 		drawText({ canvas, value: "Jest", x: 10, y: 10 });
 
 		expect(canvas.toDataURL()).not.toBe(blank.toDataURL());
+	});
+
+	it("must render a bar chart in a canvas", () => {
+		const canvas = renderBarChart({ size: 64, values: [] });
+
+		expect(canvas).toBeDefined();
 	});
 });
