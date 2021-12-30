@@ -34,25 +34,45 @@ export const BarChart = memo(
 			const itemGap = gap > 0 ? gap : 0;
 			const max = Math.max(...values);
 			const min = Math.min(...values);
-			const range = max + -min;
+			const range = max - min;
 
-			return values.map((value, index) => {
-				const itemHeight = Math.round((Math.abs(value) * height) / range);
-				const itemWidth = barWidth;
+			if (max < 0 || (max === 0 && min < 0)) {
+				return values.map((value, index) => {
+					const itemHeight = Math.abs(Math.round(((value - max) * height) / range) || 2);
 
-				return {
+					return {
+						color,
+						height: itemHeight,
+						value,
+						width: barWidth,
+						x: index * (itemGap + barWidth),
+						y: height - itemHeight,
+					};
+				});
+			} else if (min >= 0) {
+				return values.map((value, index) => ({
 					color,
-					height: itemHeight,
+					height: Math.round(((value - min) * height) / range) || 2,
 					value,
-					width: itemWidth,
-					x: index * (itemGap + itemWidth),
-					y: Math.round(
-						value > 0
-							? (Math.abs(min) * height) / range
-							: (Math.abs(min) * height) / range - itemHeight
-					),
-				};
-			});
+					width: barWidth,
+					x: index * (itemGap + barWidth),
+					y: 0,
+				}));
+			} else {
+				return values.map((value, index) => {
+					const itemHeight = Math.abs(Math.round((value * height) / range)) || 2;
+					const zero = Math.round(((range - Math.abs(max)) * height) / range);
+
+					return {
+						color,
+						height: itemHeight,
+						value,
+						width: barWidth,
+						x: index * (itemGap + barWidth),
+						y: value < 0 ? zero - itemHeight : zero,
+					};
+				});
+			}
 		}, [barWidth, color, gap, height, values]);
 
 		const handleMouseMove = useDebounceCallback(

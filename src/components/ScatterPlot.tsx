@@ -43,14 +43,14 @@ export const ScatterPlot = memo(
 
 		const items = useMemo(() => {
 			const position = size - gap - itemSize * 2 - 2;
-			const rangeX = maxX + -minX;
-			const rangeY = maxY + -minY;
+			const rangeX = maxX - minX;
+			const rangeY = maxY - minY;
 
 			return x.map((value, index) => ({
 				color: dotColor,
 				size: itemSize,
-				x: Math.round(((value + -minX) * position) / rangeX) + gap + itemSize,
-				y: Math.round((((y[index] ?? 0) + -minY) * position) / rangeY) + gap + itemSize,
+				x: Math.round(((value - minX) * position) / rangeX) + gap + itemSize,
+				y: Math.round((((y[index] ?? 0) - minY) * position) / rangeY) + gap + itemSize,
 				value: `${value}, ${y[index] ?? 0}`,
 			}));
 		}, [dotColor, itemSize, maxX, maxY, minX, minY, size, x, y]);

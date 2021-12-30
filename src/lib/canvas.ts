@@ -132,29 +132,51 @@ export const renderBarChart = (props: RenderBarChartProps): HTMLCanvasElement =>
 	const { barWidth = 8, color = "black", gap = 0, size, values } = props;
 	const canvas = document.createElement("canvas");
 	const height = size;
+	let items = [];
 	const width = (values.length - 1) * (barWidth + gap) + barWidth;
 	const max = Math.max(...values);
 	const min = Math.min(...values);
-	const range = max + -min;
+	const range = max - min;
 
 	setup({ canvas, height, width });
 
-	const items = values.map((value, index) => {
-		const itemHeight = Math.round((Math.abs(value) * height) / range);
+	if (max < 0 || (max === 0 && min < 0)) {
+		items = values.map((value, index) => {
+			const itemHeight = Math.abs(Math.round(((value - max) * height) / range) || 2);
 
-		return {
+			return {
+				color,
+				height: itemHeight,
+				value,
+				width: barWidth,
+				x: index * (barWidth + gap),
+				y: height - itemHeight,
+			};
+		});
+	} else if (min >= 0) {
+		items = values.map((value, index) => ({
 			color,
-			height: itemHeight,
+			height: Math.round(((value - min) * height) / range) || 2,
 			value,
 			width: barWidth,
 			x: index * (barWidth + gap),
-			y: Math.round(
-				value > 0
-					? (Math.abs(min) * height) / range
-					: (Math.abs(min) * height) / range - itemHeight
-			),
-		};
-	});
+			y: 0,
+		}));
+	} else {
+		items = values.map((value, index) => {
+			const itemHeight = Math.abs(Math.round((value * height) / range)) || 2;
+			const zero = Math.round(((range - Math.abs(max)) * height) / range);
+
+			return {
+				color,
+				height: itemHeight,
+				value,
+				width: barWidth,
+				x: index * (barWidth + gap),
+				y: value < 0 ? zero - itemHeight : zero,
+			};
+		});
+	}
 
 	items.forEach((item) => drawRectangle({ ...item, canvas }));
 
