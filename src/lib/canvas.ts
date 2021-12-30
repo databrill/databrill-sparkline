@@ -37,6 +37,7 @@ interface RenderBarChartProps {
 	readonly barWidth?: number;
 	readonly color?: string;
 	readonly gap?: number;
+	readonly min?: number;
 	readonly size: number;
 	readonly values: readonly number[];
 }
@@ -135,7 +136,7 @@ export const renderBarChart = (props: RenderBarChartProps): HTMLCanvasElement =>
 	let items = [];
 	const width = (values.length - 1) * (barWidth + gap) + barWidth;
 	const max = Math.max(...values);
-	const min = Math.min(...values);
+	const min = props.min ?? Math.min(...values);
 	const range = max - min;
 
 	setup({ canvas, height, width });
@@ -156,7 +157,7 @@ export const renderBarChart = (props: RenderBarChartProps): HTMLCanvasElement =>
 	} else if (min >= 0) {
 		items = values.map((value, index) => ({
 			color,
-			height: Math.round(((value - min) * height) / range) || 2,
+			height: value <= 0 ? 2 : Math.round(((value - min) * height) / range),
 			value,
 			width: barWidth,
 			x: index * (barWidth + gap),

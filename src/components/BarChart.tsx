@@ -11,6 +11,7 @@ export interface BarChartProps {
 	readonly color?: string;
 	readonly gap?: number;
 	readonly highlightColor?: string;
+	readonly min?: number;
 	readonly size: number;
 	readonly values: readonly number[];
 }
@@ -22,6 +23,7 @@ export const BarChart = memo(
 		color = "black",
 		gap = 0,
 		highlightColor = "red",
+		min: forceMin,
 		size,
 		values,
 	}: BarChartProps): JSX.Element => {
@@ -33,7 +35,7 @@ export const BarChart = memo(
 		const items = useMemo(() => {
 			const itemGap = gap > 0 ? gap : 0;
 			const max = Math.max(...values);
-			const min = Math.min(...values);
+			const min = forceMin ?? Math.min(...values);
 			const range = max - min;
 
 			if (max < 0 || (max === 0 && min < 0)) {
@@ -52,7 +54,7 @@ export const BarChart = memo(
 			} else if (min >= 0) {
 				return values.map((value, index) => ({
 					color,
-					height: Math.round(((value - min) * height) / range) || 2,
+					height: value <= 0 ? 2 : Math.round(((value - min) * height) / range),
 					value,
 					width: barWidth,
 					x: index * (itemGap + barWidth),
@@ -73,7 +75,9 @@ export const BarChart = memo(
 					};
 				});
 			}
-		}, [barWidth, color, gap, height, values]);
+		}, [barWidth, color, forceMin, gap, height, values]);
+
+		console.log(items);
 
 		const handleMouseMove = useDebounceCallback(
 			(event: MouseEvent<HTMLCanvasElement>): void => {
