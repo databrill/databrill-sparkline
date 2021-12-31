@@ -77,8 +77,6 @@ export const BarChart = memo(
 			}
 		}, [barWidth, color, forceMin, gap, height, values]);
 
-		console.log(items);
-
 		const handleMouseMove = useDebounceCallback(
 			(event: MouseEvent<HTMLCanvasElement>): void => {
 				const canvas = ref.current;

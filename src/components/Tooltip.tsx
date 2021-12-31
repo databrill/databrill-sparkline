@@ -25,6 +25,7 @@ export const Tooltip = memo(
 					position: "absolute",
 					textAlign: "center",
 					top,
+					zIndex: 1,
 				}}
 			>
 				{value}
