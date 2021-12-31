@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+
 interface DrawCircleProps {
 	readonly canvas: HTMLCanvasElement | null;
 	readonly color?: string;
@@ -37,6 +39,7 @@ interface RenderBarChartProps {
 	readonly barWidth?: number;
 	readonly color?: string;
 	readonly gap?: number;
+	readonly highlightColor?: string;
 	readonly min?: number;
 	readonly size: number;
 	readonly values: readonly number[];
@@ -123,23 +126,35 @@ export const setup = (props: SetupProps): void => {
 
 	if (!(canvas && context)) return;
 
-	canvas.height = height;
-	canvas.width = width;
+	canvas.setAttribute("height", `${height}px`);
+	canvas.setAttribute("width", `${width}px`);
 	context.translate(0, height);
 	context.scale(1, -1);
 };
 
-export const renderBarChart = (props: RenderBarChartProps): HTMLCanvasElement => {
-	const { barWidth = 8, color = "black", gap = 0, size, values } = props;
+export const renderBarChart = (props: RenderBarChartProps): HTMLDivElement => {
+	const { barWidth = 8, color = "black", gap = 0, highlightColor = "red", size, values } = props;
 	const canvas = document.createElement("canvas");
+	const container = document.createElement("div");
+	const tooltip = document.createElement("div");
 	const height = size;
+	// @ts-ignore
 	let items = [];
 	const width = (values.length - 1) * (barWidth + gap) + barWidth;
 	const max = Math.max(...values);
 	const min = props.min ?? Math.min(...values);
 	const range = max - min;
 
+	container.style.setProperty("display", "inline-flex");
+	container.style.setProperty("position", "relative");
 	setup({ canvas, height, width });
+	tooltip.style.setProperty("background-color", "rgba(60, 60, 60, 0.75)");
+	tooltip.style.setProperty("color", "white");
+	tooltip.style.setProperty("display", "none");
+	tooltip.style.setProperty("font-size", "12px");
+	tooltip.style.setProperty("padding", "2px 8px");
+	tooltip.style.setProperty("position", "absolute");
+	tooltip.style.setProperty("text-align", "center");
 
 	if (max < 0 || (max === 0 && min < 0)) {
 		items = values.map((value, index) => {
@@ -179,7 +194,40 @@ export const renderBarChart = (props: RenderBarChartProps): HTMLCanvasElement =>
 		});
 	}
 
-	items.forEach((item) => drawRectangle({ ...item, canvas }));
+	canvas.addEventListener("mousemove", (event) => {
+		const bound = canvas.getBoundingClientRect();
+		const x = event.clientX - bound.left - canvas.clientLeft;
+		const y = event.clientY - bound.top - canvas.clientTop;
 
-	return canvas;
+		// @ts-ignore
+		const current = items.find((item) => x >= item.x && x <= item.x + item.width);
+
+		if (current) {
+			tooltip.innerHTML = current.value;
+			tooltip.style.removeProperty("display");
+			tooltip.setAttribute("aria-label", current.value);
+			tooltip.style.setProperty("left", `${x + 8}px`);
+			tooltip.style.setProperty("top", `${y - 16}px`);
+		} else {
+			tooltip.style.setProperty("display", "none");
+		}
+
+		// @ts-ignore
+		items.forEach((item) => {
+			const active = current?.x === item.x;
+			drawRectangle({ ...item, canvas, color: active ? highlightColor : item.color });
+		});
+	});
+
+	canvas.addEventListener("mouseout", () => {
+		// @ts-ignore
+		items.forEach((item) => drawRectangle({ ...item, canvas }));
+		tooltip.style.setProperty("display", "none");
+	});
+
+	items.forEach((item) => drawRectangle({ ...item, canvas }));
+	container.appendChild(canvas);
+	container.appendChild(tooltip);
+
+	return container;
 };
