@@ -80,10 +80,17 @@ export const BarChart = memo(
 		const handleMouseMove = useDebounceCallback(
 			(event: MouseEvent<HTMLCanvasElement>): void => {
 				const canvas = ref.current;
-				const bound = canvas?.getBoundingClientRect();
-				const x = event.clientX - (bound?.left ?? 0) - (canvas?.clientLeft ?? 0);
-				const y = event.clientY - (bound?.top ?? 0) - (canvas?.clientTop ?? 0);
-				const current = items.find((item) => x >= item.x && x <= item.x + item.width);
+				const canvasPosition = canvas?.getBoundingClientRect();
+				const canvasClientLeft = canvas?.clientLeft ?? 0;
+				const canvasLeft = canvasPosition?.left ?? 0;
+
+				const x = event.clientX;
+				const y = event.clientY;
+				const current = items.find(
+					(item) =>
+						x >= item.x + canvasLeft + canvasClientLeft &&
+						x <= item.x + item.width + canvasLeft + canvasClientLeft
+				);
 
 				if (current)
 					setTooltip({ hidden: false, left: x + 8, top: y - 16, value: current?.value });
@@ -112,7 +119,7 @@ export const BarChart = memo(
 		}, [items]);
 
 		return (
-			<div className={className} style={{ display: "inline-flex", position: "relative" }}>
+			<div className={className} style={{ display: "inline-flex" }}>
 				<canvas onMouseMove={handleMouseMove} onMouseOut={handleMouseOut} ref={ref} />
 				<Tooltip
 					hidden={tooltip?.hidden}

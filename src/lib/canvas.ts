@@ -146,7 +146,6 @@ export const renderBarChart = (props: RenderBarChartProps): HTMLDivElement => {
 	const range = max - min;
 
 	container.style.setProperty("display", "inline-flex");
-	container.style.setProperty("position", "relative");
 	setup({ canvas, height, width });
 	tooltip.style.setProperty("background-color", "rgba(60, 60, 60, 0.75)");
 	tooltip.style.setProperty("color", "white");
@@ -195,12 +194,15 @@ export const renderBarChart = (props: RenderBarChartProps): HTMLDivElement => {
 	}
 
 	canvas.addEventListener("mousemove", (event) => {
-		const bound = canvas.getBoundingClientRect();
-		const x = event.clientX - bound.left - canvas.clientLeft;
-		const y = event.clientY - bound.top - canvas.clientTop;
+		const canvasPosition = canvas.getBoundingClientRect();
+		const canvasClientLeft = canvas.clientLeft ?? 0;
+		const canvasLeft = canvasPosition.left ?? 0;
 
+		const x = event.clientX;
+		const y = event.clientY;
 		// @ts-ignore
-		const current = items.find((item) => x >= item.x && x <= item.x + item.width);
+		// prettier-ignore
+		const current = items.find((item) => x >= item.x + canvasLeft + canvasClientLeft && x <= item.x + item.width + canvasLeft + canvasClientLeft);
 
 		if (current) {
 			tooltip.innerHTML = current.value;
