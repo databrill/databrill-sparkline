@@ -132,10 +132,10 @@ export const setup = (props: SetupProps): void => {
 	context.scale(1, -1);
 };
 
-export const renderBarChart = (props: RenderBarChartProps): HTMLDivElement => {
+export const renderBarChart = (props: RenderBarChartProps): HTMLCanvasElement => {
 	const { barWidth = 8, color = "black", gap = 0, highlightColor = "red", size, values } = props;
 	const canvas = document.createElement("canvas");
-	const container = document.createElement("div");
+	const portal = document.getElementById("portal-root");
 	const tooltip = document.createElement("div");
 	const height = size;
 	// @ts-ignore
@@ -145,11 +145,9 @@ export const renderBarChart = (props: RenderBarChartProps): HTMLDivElement => {
 	const min = props.min ?? Math.min(...values);
 	const range = max - min;
 
-	container.style.setProperty("display", "inline-flex");
 	setup({ canvas, height, width });
 	tooltip.style.setProperty("background-color", "rgba(60, 60, 60, 0.75)");
 	tooltip.style.setProperty("color", "white");
-	tooltip.style.setProperty("display", "none");
 	tooltip.style.setProperty("font-size", "12px");
 	tooltip.style.setProperty("padding", "2px 8px");
 	tooltip.style.setProperty("position", "absolute");
@@ -206,12 +204,12 @@ export const renderBarChart = (props: RenderBarChartProps): HTMLDivElement => {
 
 		if (current) {
 			tooltip.innerHTML = current.value;
-			tooltip.style.removeProperty("display");
 			tooltip.setAttribute("aria-label", current.value);
 			tooltip.style.setProperty("left", `${x + 8}px`);
 			tooltip.style.setProperty("top", `${y - 16}px`);
+			portal?.appendChild(tooltip);
 		} else {
-			tooltip.style.setProperty("display", "none");
+			if (tooltip.parentNode) portal?.removeChild(tooltip);
 		}
 
 		// @ts-ignore
@@ -224,12 +222,10 @@ export const renderBarChart = (props: RenderBarChartProps): HTMLDivElement => {
 	canvas.addEventListener("mouseout", () => {
 		// @ts-ignore
 		items.forEach((item) => drawRectangle({ ...item, canvas }));
-		tooltip.style.setProperty("display", "none");
+		if (tooltip.parentNode) portal?.removeChild(tooltip);
 	});
 
 	items.forEach((item) => drawRectangle({ ...item, canvas }));
-	container.appendChild(canvas);
-	container.appendChild(tooltip);
 
-	return container;
+	return canvas;
 };

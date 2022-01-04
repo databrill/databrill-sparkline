@@ -27,7 +27,8 @@ export const BarChart = memo(
 		size,
 		values,
 	}: BarChartProps): JSX.Element => {
-		const [tooltip, setTooltip] = useState<TooltipProps | null>(null);
+		const [showTooltip, setShowTooltip] = useState<boolean>(false);
+		const [tooltipProps, setTooltipProps] = useState<TooltipProps | null>(null);
 		const height = size;
 		const width = (values.length - 1) * (barWidth + gap) + barWidth;
 		const ref = useRef<HTMLCanvasElement>(null);
@@ -92,9 +93,12 @@ export const BarChart = memo(
 						x <= item.x + item.width + canvasLeft + canvasClientLeft
 				);
 
-				if (current)
-					setTooltip({ hidden: false, left: x + 8, top: y - 16, value: current?.value });
-				else setTooltip(null);
+				if (current) {
+					setTooltipProps({ left: x + 8, top: y - 16, value: current?.value });
+					setShowTooltip(true);
+				} else {
+					setShowTooltip(false);
+				}
 
 				items.forEach((item) => {
 					const active = current?.x === item.x;
@@ -107,7 +111,7 @@ export const BarChart = memo(
 		const handleMouseOut = useCallback(() => {
 			handleMouseMove.cancel();
 			items.forEach((item) => drawRectangle({ ...item, canvas: ref.current }));
-			setTooltip(null);
+			setShowTooltip(false);
 		}, [handleMouseMove, items]);
 
 		useEffect(() => {
@@ -121,12 +125,13 @@ export const BarChart = memo(
 		return (
 			<div className={className} style={{ display: "inline-flex" }}>
 				<canvas onMouseMove={handleMouseMove} onMouseOut={handleMouseOut} ref={ref} />
-				<Tooltip
-					hidden={tooltip?.hidden}
-					left={tooltip?.left}
-					top={tooltip?.top}
-					value={tooltip?.value}
-				/>
+				{showTooltip ? (
+					<Tooltip
+						left={tooltipProps?.left}
+						top={tooltipProps?.top}
+						value={tooltipProps?.value}
+					/>
+				) : null}
 			</div>
 		);
 	}

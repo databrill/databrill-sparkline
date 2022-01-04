@@ -39,7 +39,8 @@ export const ScatterPlot = memo(
 		const plotHeight = size - gap - 1;
 		const plotWidth = size - gap - 1;
 		const ref = useRef<HTMLCanvasElement>(null);
-		const [tooltip, setTooltip] = useState<TooltipProps | null>(null);
+		const [showTooltip, setShowTooltip] = useState<boolean>(false);
+		const [tooltipProps, setTooltipProps] = useState<TooltipProps | null>(null);
 
 		const items = useMemo(() => {
 			const position = size - gap - itemSize * 2 - 2;
@@ -63,9 +64,12 @@ export const ScatterPlot = memo(
 				const y = event.clientY - (bound?.top ?? 0) - (canvas?.clientTop ?? 0);
 				const current = items.find((item) => x >= item.x && x <= item.x + item.size);
 
-				if (current)
-					setTooltip({ hidden: false, left: x + 8, top: y - 16, value: current?.value });
-				else setTooltip(null);
+				if (current) {
+					setTooltipProps({ left: x + 8, top: y - 16, value: current?.value });
+					setShowTooltip(true);
+				} else {
+					setShowTooltip(false);
+				}
 
 				items.forEach((item) => {
 					const active = current?.x === item.x;
@@ -78,7 +82,7 @@ export const ScatterPlot = memo(
 		const handleMouseOut = useCallback(() => {
 			handleMouseMove.cancel();
 			items.forEach((item) => drawCircle({ ...item, canvas: ref.current }));
-			setTooltip(null);
+			setShowTooltip(false);
 		}, [handleMouseMove, items]);
 
 		useEffect(() => {
@@ -144,12 +148,13 @@ export const ScatterPlot = memo(
 		return (
 			<div className={className} style={{ display: "inline-flex", position: "relative" }}>
 				<canvas onMouseMove={handleMouseMove} onMouseOut={handleMouseOut} ref={ref} />
-				<Tooltip
-					hidden={tooltip?.hidden}
-					left={tooltip?.left}
-					top={tooltip?.top}
-					value={tooltip?.value}
-				/>
+				{showTooltip ? (
+					<Tooltip
+						left={tooltipProps?.left}
+						top={tooltipProps?.top}
+						value={tooltipProps?.value}
+					/>
+				) : null}
 			</div>
 		);
 	}
