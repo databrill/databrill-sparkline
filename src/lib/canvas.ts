@@ -209,7 +209,7 @@ export const renderBarChart = (props: RenderBarChartProps): HTMLCanvasElement =>
 			tooltip.style.setProperty("top", `${y - 16}px`);
 			portal?.appendChild(tooltip);
 		} else {
-			if (tooltip.parentNode) portal?.removeChild(tooltip);
+			tooltip?.remove();
 		}
 
 		// @ts-ignore
@@ -222,7 +222,7 @@ export const renderBarChart = (props: RenderBarChartProps): HTMLCanvasElement =>
 	canvas.addEventListener("mouseout", () => {
 		// @ts-ignore
 		items.forEach((item) => drawRectangle({ ...item, canvas }));
-		if (tooltip.parentNode) portal?.removeChild(tooltip);
+		tooltip?.remove();
 	});
 
 	items.forEach((item) => drawRectangle({ ...item, canvas }));
