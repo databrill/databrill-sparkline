@@ -14,6 +14,7 @@ export interface BarChartProps {
 	readonly min?: number;
 	readonly size: number;
 	readonly values: readonly number[];
+	readonly zeroColor?: string;
 }
 
 export const BarChart = memo(
@@ -26,12 +27,14 @@ export const BarChart = memo(
 		min: forceMin,
 		size,
 		values,
+		zeroColor = "black",
 	}: BarChartProps): JSX.Element => {
 		const [showTooltip, setShowTooltip] = useState<boolean>(false);
 		const [tooltipProps, setTooltipProps] = useState<TooltipProps | null>(null);
 		const height = size;
-		const width = (values.length - 1) * (barWidth + gap) + barWidth;
+		const minBarHeight = 1;
 		const ref = useRef<HTMLCanvasElement>(null);
+		const width = (values.length - 1) * (barWidth + gap) + barWidth;
 
 		const items = useMemo(() => {
 			const itemGap = gap > 0 ? gap : 0;
@@ -41,11 +44,11 @@ export const BarChart = memo(
 
 			if (max < 0 || (max === 0 && min < 0)) {
 				return values.map((value, index) => {
-					const itemHeight = Math.abs(Math.round(((value - max) * height) / range) || 2);
+					const itemHeight = Math.abs(Math.round(((value - max) * height) / range));
 
 					return {
-						color,
-						height: itemHeight,
+						color: value === 0 ? zeroColor : color,
+						height: value === 0 ? minBarHeight : itemHeight,
 						value,
 						width: barWidth,
 						x: index * (itemGap + barWidth),
@@ -53,22 +56,26 @@ export const BarChart = memo(
 					};
 				});
 			} else if (min >= 0) {
-				return values.map((value, index) => ({
-					color,
-					height: value <= 0 ? 2 : Math.round(((value - min) * height) / range),
-					value,
-					width: barWidth,
-					x: index * (itemGap + barWidth),
-					y: 0,
-				}));
+				return values.map((value, index) => {
+					const itemHeight = Math.abs(Math.round(((value - min) * height) / range));
+
+					return {
+						color: value === 0 ? zeroColor : color,
+						height: value <= 0 ? minBarHeight : itemHeight,
+						value,
+						width: barWidth,
+						x: index * (itemGap + barWidth),
+						y: 0,
+					};
+				});
 			} else {
 				return values.map((value, index) => {
-					const itemHeight = Math.abs(Math.round((value * height) / range)) || 2;
+					const itemHeight = Math.abs(Math.round((value * height) / range));
 					const zero = Math.round(((range - Math.abs(max)) * height) / range);
 
 					return {
-						color,
-						height: itemHeight,
+						color: value === 0 ? zeroColor : color,
+						height: value === 0 ? minBarHeight : itemHeight,
 						value,
 						width: barWidth,
 						x: index * (itemGap + barWidth),
@@ -76,7 +83,7 @@ export const BarChart = memo(
 					};
 				});
 			}
-		}, [barWidth, color, forceMin, gap, height, values]);
+		}, [barWidth, color, forceMin, gap, height, values, zeroColor]);
 
 		const handleMouseMove = useDebounceCallback(
 			(event: MouseEvent<HTMLCanvasElement>): void => {

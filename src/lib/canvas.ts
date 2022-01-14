@@ -43,6 +43,7 @@ interface RenderBarChartProps {
 	readonly min?: number;
 	readonly size: number;
 	readonly values: readonly number[];
+	readonly zeroColor?: string;
 }
 
 interface SetupProps {
@@ -132,18 +133,27 @@ export const setup = (props: SetupProps): void => {
 	context.scale(1, -1);
 };
 
-export const renderBarChart = (props: RenderBarChartProps): HTMLCanvasElement => {
-	const { barWidth = 8, color = "black", gap = 0, highlightColor = "red", size, values } = props;
+export const renderBarChart = ({
+	barWidth = 8,
+	color = "black",
+	gap = 0,
+	highlightColor = "red",
+	min: forceMin,
+	size,
+	values,
+	zeroColor = "black",
+}: RenderBarChartProps): HTMLCanvasElement => {
 	const canvas = document.createElement("canvas");
-	const portal = document.getElementById("portal-root");
-	const tooltip = document.createElement("div");
 	const height = size;
+	const minBarHeight = 1;
 	// @ts-ignore
 	let items = [];
-	const width = (values.length - 1) * (barWidth + gap) + barWidth;
 	const max = Math.max(...values);
-	const min = props.min ?? Math.min(...values);
+	const min = forceMin ?? Math.min(...values);
+	const portal = document.getElementById("portal-root");
 	const range = max - min;
+	const tooltip = document.createElement("div");
+	const width = (values.length - 1) * (barWidth + gap) + barWidth;
 
 	setup({ canvas, height, width });
 	tooltip.style.setProperty("background-color", "rgba(60, 60, 60, 0.75)");
@@ -155,10 +165,10 @@ export const renderBarChart = (props: RenderBarChartProps): HTMLCanvasElement =>
 
 	if (max < 0 || (max === 0 && min < 0)) {
 		items = values.map((value, index) => {
-			const itemHeight = Math.abs(Math.round(((value - max) * height) / range) || 2);
+			const itemHeight = Math.abs(Math.round(((value - max) * height) / range));
 
 			return {
-				color,
+				color: value === 0 ? zeroColor : color,
 				height: itemHeight,
 				value,
 				width: barWidth,
@@ -167,22 +177,26 @@ export const renderBarChart = (props: RenderBarChartProps): HTMLCanvasElement =>
 			};
 		});
 	} else if (min >= 0) {
-		items = values.map((value, index) => ({
-			color,
-			height: value <= 0 ? 2 : Math.round(((value - min) * height) / range),
-			value,
-			width: barWidth,
-			x: index * (barWidth + gap),
-			y: 0,
-		}));
+		items = values.map((value, index) => {
+			const itemHeight = Math.abs(Math.round(((value - min) * height) / range));
+
+			return {
+				color: value === 0 ? zeroColor : color,
+				height: value <= 0 ? minBarHeight : itemHeight,
+				value,
+				width: barWidth,
+				x: index * (barWidth + gap),
+				y: 0,
+			};
+		});
 	} else {
 		items = values.map((value, index) => {
-			const itemHeight = Math.abs(Math.round((value * height) / range)) || 2;
+			const itemHeight = Math.abs(Math.round((value * height) / range));
 			const zero = Math.round(((range - Math.abs(max)) * height) / range);
 
 			return {
-				color,
-				height: itemHeight,
+				color: value === 0 ? zeroColor : color,
+				height: value === 0 ? minBarHeight : itemHeight,
 				value,
 				width: barWidth,
 				x: index * (barWidth + gap),
