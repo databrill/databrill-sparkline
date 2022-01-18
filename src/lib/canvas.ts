@@ -163,17 +163,17 @@ export const renderBarChart = ({
 	tooltip.style.setProperty("position", "absolute");
 	tooltip.style.setProperty("text-align", "center");
 
-	if (max < 0 || (max === 0 && min < 0)) {
+	if (max <= 0 && min < 0) {
 		items = values.map((value, index) => {
 			const itemHeight = Math.abs(Math.round(((value - max) * height) / range));
 
 			return {
 				color: value === 0 ? zeroColor : color,
-				height: itemHeight,
+				height: itemHeight + minBarHeight,
 				value,
 				width: barWidth,
 				x: index * (barWidth + gap),
-				y: height - itemHeight,
+				y: height - itemHeight - minBarHeight,
 			};
 		});
 	} else if (min >= 0) {
@@ -182,7 +182,7 @@ export const renderBarChart = ({
 
 			return {
 				color: value === 0 ? zeroColor : color,
-				height: value <= 0 ? minBarHeight : itemHeight,
+				height: itemHeight + minBarHeight,
 				value,
 				width: barWidth,
 				x: index * (barWidth + gap),
@@ -196,7 +196,7 @@ export const renderBarChart = ({
 
 			return {
 				color: value === 0 ? zeroColor : color,
-				height: value === 0 ? minBarHeight : itemHeight,
+				height: value >= 0 ? itemHeight + minBarHeight : itemHeight,
 				value,
 				width: barWidth,
 				x: index * (barWidth + gap),

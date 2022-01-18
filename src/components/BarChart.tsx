@@ -42,17 +42,17 @@ export const BarChart = memo(
 			const min = forceMin ?? Math.min(...values);
 			const range = max - min;
 
-			if (max < 0 || (max === 0 && min < 0)) {
+			if (max <= 0 && min < 0) {
 				return values.map((value, index) => {
 					const itemHeight = Math.abs(Math.round(((value - max) * height) / range));
 
 					return {
 						color: value === 0 ? zeroColor : color,
-						height: value === 0 ? minBarHeight : itemHeight,
+						height: itemHeight + minBarHeight,
 						value,
 						width: barWidth,
 						x: index * (itemGap + barWidth),
-						y: height - itemHeight,
+						y: height - itemHeight - minBarHeight,
 					};
 				});
 			} else if (min >= 0) {
@@ -61,7 +61,7 @@ export const BarChart = memo(
 
 					return {
 						color: value === 0 ? zeroColor : color,
-						height: value <= 0 ? minBarHeight : itemHeight,
+						height: itemHeight + minBarHeight,
 						value,
 						width: barWidth,
 						x: index * (itemGap + barWidth),
@@ -75,7 +75,7 @@ export const BarChart = memo(
 
 					return {
 						color: value === 0 ? zeroColor : color,
-						height: value === 0 ? minBarHeight : itemHeight,
+						height: value >= 0 ? itemHeight + minBarHeight : itemHeight,
 						value,
 						width: barWidth,
 						x: index * (itemGap + barWidth),
