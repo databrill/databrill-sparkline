@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
+import { calculateBarChartItems } from "./calcs";
+
 interface DrawCircleProps {
 	readonly canvas: HTMLCanvasElement | null;
 	readonly color?: string;
@@ -35,10 +37,10 @@ interface DrawTextProps {
 	readonly y: number;
 }
 
-interface RenderBarChartProps {
+export interface RenderBarChartProps {
+	readonly barGap?: number;
 	readonly barWidth?: number;
 	readonly color?: string;
-	readonly gap?: number;
 	readonly highlightColor?: string;
 	readonly min?: number;
 	readonly size: number;
@@ -134,26 +136,21 @@ export const setup = (props: SetupProps): void => {
 };
 
 export const renderBarChart = ({
+	barGap = 0,
 	barWidth = 8,
 	color = "black",
-	gap = 0,
 	highlightColor = "red",
 	min: forceMin,
-	size,
+	size: height,
 	values,
 	zeroColor = "black",
 }: RenderBarChartProps): HTMLCanvasElement => {
 	const canvas = document.createElement("canvas");
-	const height = size;
-	const minBarHeight = 1;
-	// @ts-ignore
-	let items = [];
-	const max = Math.max(...values);
-	const min = forceMin ?? Math.min(...values);
+	// prettier-ignore
+	const items = calculateBarChartItems({ barGap, barWidth, color, forceMin, height, values, zeroColor });
 	const portal = document.getElementById("portal-root");
-	const range = max - min;
 	const tooltip = document.createElement("div");
-	const width = (values.length - 1) * (barWidth + gap) + barWidth;
+	const width = (values.length - 1) * (barGap + barWidth) + barWidth;
 
 	setup({ canvas, height, width });
 	tooltip.style.setProperty("background-color", "rgba(60, 60, 60, 0.75)");
@@ -162,48 +159,6 @@ export const renderBarChart = ({
 	tooltip.style.setProperty("padding", "2px 8px");
 	tooltip.style.setProperty("position", "absolute");
 	tooltip.style.setProperty("text-align", "center");
-
-	if (max <= 0 && min < 0) {
-		items = values.map((value, index) => {
-			const itemHeight = Math.abs(Math.round(((value - max) * height) / range));
-
-			return {
-				color: value === 0 ? zeroColor : color,
-				height: itemHeight + minBarHeight,
-				value,
-				width: barWidth,
-				x: index * (barWidth + gap),
-				y: height - itemHeight - minBarHeight,
-			};
-		});
-	} else if (min >= 0) {
-		items = values.map((value, index) => {
-			const itemHeight = Math.abs(Math.round(((value - min) * height) / range));
-
-			return {
-				color: value === 0 ? zeroColor : color,
-				height: itemHeight + minBarHeight,
-				value,
-				width: barWidth,
-				x: index * (barWidth + gap),
-				y: 0,
-			};
-		});
-	} else {
-		items = values.map((value, index) => {
-			const itemHeight = Math.abs(Math.round((value * height) / range));
-			const zero = Math.round(((range - Math.abs(max)) * height) / range);
-
-			return {
-				color: value === 0 ? zeroColor : color,
-				height: value >= 0 ? itemHeight + minBarHeight : itemHeight,
-				value,
-				width: barWidth,
-				x: index * (barWidth + gap),
-				y: value < 0 ? zero - itemHeight : zero,
-			};
-		});
-	}
 
 	canvas.addEventListener("mousemove", (event) => {
 		const canvasPosition = canvas.getBoundingClientRect();
@@ -217,8 +172,8 @@ export const renderBarChart = ({
 		const current = items.find((item) => x >= item.x + canvasLeft + canvasClientLeft && x <= item.x + item.width + canvasLeft + canvasClientLeft);
 
 		if (current) {
-			tooltip.innerHTML = current.value;
-			tooltip.setAttribute("aria-label", current.value);
+			tooltip.innerHTML = current.value.toString();
+			tooltip.setAttribute("aria-label", current.value.toString());
 			tooltip.style.setProperty("left", `${x + 8}px`);
 			tooltip.style.setProperty("top", `${y - 16}px`);
 			portal?.appendChild(tooltip);

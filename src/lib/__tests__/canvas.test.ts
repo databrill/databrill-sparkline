@@ -6,7 +6,7 @@ import {
 	drawText,
 	renderBarChart,
 	setup,
-} from "lib/canvas";
+} from "../canvas";
 
 describe("canvas", () => {
 	it("must setup size", () => {

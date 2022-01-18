@@ -1,4 +1,5 @@
 import useDebounceCallback from "hooks/useDebounceCallback";
+import { calculateBarChartItems } from "lib/calcs";
 import { drawRectangle, setup } from "lib/canvas";
 import { memo, MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Tooltip, TooltipProps } from "./Tooltip";
@@ -6,10 +7,10 @@ import { Tooltip, TooltipProps } from "./Tooltip";
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 
 export interface BarChartProps {
+	readonly barGap?: number;
 	readonly barWidth?: number;
 	readonly className?: string;
 	readonly color?: string;
-	readonly gap?: number;
 	readonly highlightColor?: string;
 	readonly min?: number;
 	readonly size: number;
@@ -19,71 +20,34 @@ export interface BarChartProps {
 
 export const BarChart = memo(
 	({
+		barGap = 0,
 		barWidth = 20,
 		className,
 		color = "black",
-		gap = 0,
 		highlightColor = "red",
 		min: forceMin,
-		size,
+		size: height,
 		values,
 		zeroColor = "black",
 	}: BarChartProps): JSX.Element => {
 		const [showTooltip, setShowTooltip] = useState<boolean>(false);
 		const [tooltipProps, setTooltipProps] = useState<TooltipProps | null>(null);
-		const height = size;
-		const minBarHeight = 1;
 		const ref = useRef<HTMLCanvasElement>(null);
-		const width = (values.length - 1) * (barWidth + gap) + barWidth;
+		const width = (values.length - 1) * (barWidth + barGap) + barWidth;
 
-		const items = useMemo(() => {
-			const itemGap = gap > 0 ? gap : 0;
-			const max = Math.max(...values);
-			const min = forceMin ?? Math.min(...values);
-			const range = max - min;
-
-			if (max <= 0 && min < 0) {
-				return values.map((value, index) => {
-					const itemHeight = Math.abs(Math.round(((value - max) * height) / range));
-
-					return {
-						color: value === 0 ? zeroColor : color,
-						height: itemHeight + minBarHeight,
-						value,
-						width: barWidth,
-						x: index * (itemGap + barWidth),
-						y: height - itemHeight - minBarHeight,
-					};
-				});
-			} else if (min >= 0) {
-				return values.map((value, index) => {
-					const itemHeight = Math.abs(Math.round(((value - min) * height) / range));
-
-					return {
-						color: value === 0 ? zeroColor : color,
-						height: itemHeight + minBarHeight,
-						value,
-						width: barWidth,
-						x: index * (itemGap + barWidth),
-						y: 0,
-					};
-				});
-			} else {
-				return values.map((value, index) => {
-					const itemHeight = Math.abs(Math.round((value * height) / range));
-					const zero = Math.round(((range - Math.abs(max)) * height) / range);
-
-					return {
-						color: value === 0 ? zeroColor : color,
-						height: value >= 0 ? itemHeight + minBarHeight : itemHeight,
-						value,
-						width: barWidth,
-						x: index * (itemGap + barWidth),
-						y: value < 0 ? zero - itemHeight : zero,
-					};
-				});
-			}
-		}, [barWidth, color, forceMin, gap, height, values, zeroColor]);
+		const items = useMemo(
+			() =>
+				calculateBarChartItems({
+					barGap,
+					barWidth,
+					color,
+					forceMin,
+					height,
+					values,
+					zeroColor,
+				}),
+			[barGap, barWidth, color, forceMin, height, values, zeroColor]
+		);
 
 		const handleMouseMove = useDebounceCallback(
 			(event: MouseEvent<HTMLCanvasElement>): void => {
