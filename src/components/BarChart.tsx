@@ -26,27 +26,26 @@ export const BarChart = memo(
 		color = "black",
 		highlightColor = "red",
 		min: forceMin,
-		size: height,
+		size: canvasHeight,
 		values,
 		zeroColor = "black",
 	}: BarChartProps): JSX.Element => {
 		const [showTooltip, setShowTooltip] = useState<boolean>(false);
 		const [tooltipProps, setTooltipProps] = useState<TooltipProps | null>(null);
 		const ref = useRef<HTMLCanvasElement>(null);
-		const width = (values.length - 1) * (barWidth + barGap) + barWidth;
 
 		const items = useMemo(
 			() =>
 				calculateBarChartItems({
 					barGap,
 					barWidth,
+					canvasHeight,
 					color,
 					forceMin,
-					height,
 					values,
 					zeroColor,
 				}),
-			[barGap, barWidth, color, forceMin, height, values, zeroColor]
+			[barGap, barWidth, canvasHeight, color, forceMin, values, zeroColor]
 		);
 
 		const handleMouseMove = useDebounceCallback(
@@ -55,7 +54,6 @@ export const BarChart = memo(
 				const canvasPosition = canvas?.getBoundingClientRect();
 				const canvasClientLeft = canvas?.clientLeft ?? 0;
 				const canvasLeft = canvasPosition?.left ?? 0;
-
 				const x = event.clientX;
 				const y = event.clientY;
 				const current = items.find(
@@ -86,8 +84,10 @@ export const BarChart = memo(
 		}, [handleMouseMove, items]);
 
 		useEffect(() => {
-			setup({ canvas: ref.current, height, width });
-		}, [height, width]);
+			const canvasWidth = (values.length - 1) * (barWidth + barGap) + barWidth;
+
+			setup({ canvas: ref.current, height: canvasHeight, width: canvasWidth });
+		}, [barGap, barWidth, canvasHeight, values.length]);
 
 		useEffect(() => {
 			items.forEach((item) => drawRectangle({ ...item, canvas: ref.current }));

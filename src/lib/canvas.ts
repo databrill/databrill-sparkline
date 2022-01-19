@@ -141,18 +141,18 @@ export const renderBarChart = ({
 	color = "black",
 	highlightColor = "red",
 	min: forceMin,
-	size: height,
+	size: canvasHeight,
 	values,
 	zeroColor = "black",
 }: RenderBarChartProps): HTMLCanvasElement => {
 	const canvas = document.createElement("canvas");
 	// prettier-ignore
-	const items = calculateBarChartItems({ barGap, barWidth, color, forceMin, height, values, zeroColor });
+	const items = calculateBarChartItems({ barGap, barWidth, canvasHeight, color, forceMin, values, zeroColor });
 	const portal = document.getElementById("portal-root");
 	const tooltip = document.createElement("div");
-	const width = (values.length - 1) * (barGap + barWidth) + barWidth;
+	const canvasWidth = (values.length - 1) * (barGap + barWidth) + barWidth;
 
-	setup({ canvas, height, width });
+	setup({ canvas, height: canvasHeight, width: canvasWidth });
 	tooltip.style.setProperty("background-color", "rgba(60, 60, 60, 0.75)");
 	tooltip.style.setProperty("color", "white");
 	tooltip.style.setProperty("font-size", "12px");
@@ -164,10 +164,8 @@ export const renderBarChart = ({
 		const canvasPosition = canvas.getBoundingClientRect();
 		const canvasClientLeft = canvas.clientLeft ?? 0;
 		const canvasLeft = canvasPosition.left ?? 0;
-
 		const x = event.clientX;
 		const y = event.clientY;
-		// @ts-ignore
 		// prettier-ignore
 		const current = items.find((item) => x >= item.x + canvasLeft + canvasClientLeft && x <= item.x + item.width + canvasLeft + canvasClientLeft);
 
