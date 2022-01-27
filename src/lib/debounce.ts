@@ -5,10 +5,10 @@ export interface DebounceFunction<T> {
 	cancel(): void;
 }
 
-const debounce = <T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: any[]) => any>(
 	fn: T,
 	timeout: number
-): DebounceFunction<T> => {
+): DebounceFunction<T> {
 	let timeoutId: number | undefined;
 
 	// @ts-ignore
@@ -20,6 +20,4 @@ const debounce = <T extends (...args: any[]) => any>(
 	next.cancel = () => window.clearTimeout(timeoutId);
 
 	return next as DebounceFunction<T>;
-};
-
-export default debounce;
+}
