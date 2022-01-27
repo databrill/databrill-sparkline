@@ -1,4 +1,4 @@
-import useDebounceCallback from "hooks/useDebounceCallback";
+import { useDebounceCallback } from "hooks/useDebounceCallback";
 import { drawCircle, drawLine, drawRectangleOutline, drawText, setup } from "lib/canvas";
 import { memo, MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Tooltip, TooltipProps } from "./Tooltip";

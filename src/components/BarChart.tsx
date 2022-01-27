@@ -1,33 +1,36 @@
-import useDebounceCallback from "hooks/useDebounceCallback";
+import { useDebounceCallback } from "hooks/useDebounceCallback";
 import { calculateBarChartItems } from "lib/calcs";
 import { drawRectangle, setup } from "lib/canvas";
+import { BarChartLayer } from "models/BarChartLayer";
 import { memo, MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Tooltip, TooltipProps } from "./Tooltip";
 
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 
 export interface BarChartProps {
+	readonly annotationColor?: string;
+	readonly barColor?: string;
 	readonly barGap?: number;
 	readonly barWidth?: number;
 	readonly className?: string;
-	readonly color?: string;
 	readonly highlightColor?: string;
+	readonly layers: readonly BarChartLayer[];
 	readonly min?: number;
 	readonly size: number;
-	readonly values: readonly number[];
 	readonly zeroColor?: string;
 }
 
 export const BarChart = memo(
 	({
+		annotationColor = "blue",
+		barColor = "black",
 		barGap = 0,
 		barWidth = 20,
 		className,
-		color = "black",
 		highlightColor = "red",
+		layers,
 		min: forceMin,
 		size: canvasHeight,
-		values,
 		zeroColor = "black",
 	}: BarChartProps): JSX.Element => {
 		const [showTooltip, setShowTooltip] = useState<boolean>(false);
@@ -37,15 +40,16 @@ export const BarChart = memo(
 		const items = useMemo(
 			() =>
 				calculateBarChartItems({
+					annotationColor,
+					barColor,
 					barGap,
 					barWidth,
 					canvasHeight,
-					color,
 					forceMin,
-					values,
+					layers,
 					zeroColor,
 				}),
-			[barGap, barWidth, canvasHeight, color, forceMin, values, zeroColor]
+			[annotationColor, barColor, barGap, barWidth, canvasHeight, forceMin, layers, zeroColor]
 		);
 
 		const handleMouseMove = useDebounceCallback(
@@ -71,7 +75,8 @@ export const BarChart = memo(
 
 				items.forEach((item) => {
 					const active = current?.x === item.x;
-					drawRectangle({ ...item, canvas, color: active ? highlightColor : item.color });
+					const color = active && item.type === "bar" ? highlightColor : item.color;
+					drawRectangle({ ...item, canvas, color });
 				});
 			},
 			[highlightColor, items]
@@ -84,10 +89,12 @@ export const BarChart = memo(
 		}, [handleMouseMove, items]);
 
 		useEffect(() => {
-			const canvasWidth = (values.length - 1) * (barWidth + barGap) + barWidth;
+			const barsLayer = layers.find((layer) => layer.type === "bars");
+			const barsLayerLength = barsLayer?.values.length ?? 0;
+			const canvasWidth = (barsLayerLength - 1) * (barWidth + barGap) + barWidth;
 
 			setup({ canvas: ref.current, height: canvasHeight, width: canvasWidth });
-		}, [barGap, barWidth, canvasHeight, values.length]);
+		}, [barGap, barWidth, canvasHeight, layers]);
 
 		useEffect(() => {
 			items.forEach((item) => drawRectangle({ ...item, canvas: ref.current }));

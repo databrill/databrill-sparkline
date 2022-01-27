@@ -86,7 +86,7 @@ describe("canvas", () => {
 	});
 
 	it("must render a bar chart in a canvas", () => {
-		const canvas = renderBarChart({ size: 64, values: [] });
+		const canvas = renderBarChart({ layers: [], size: 64 });
 
 		expect(canvas).toBeDefined();
 	});

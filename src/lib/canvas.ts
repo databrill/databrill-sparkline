@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-
+import { BarChartLayer } from "models/BarChartLayer";
 import { calculateBarChartItems } from "./calcs";
 
 interface DrawCircleProps {
@@ -38,13 +37,14 @@ interface DrawTextProps {
 }
 
 export interface RenderBarChartProps {
+	readonly annotationColor?: string;
+	readonly barColor?: string;
 	readonly barGap?: number;
 	readonly barWidth?: number;
-	readonly color?: string;
 	readonly highlightColor?: string;
+	readonly layers: readonly BarChartLayer[];
 	readonly min?: number;
 	readonly size: number;
-	readonly values: readonly number[];
 	readonly zeroColor?: string;
 }
 
@@ -54,7 +54,7 @@ interface SetupProps {
 	readonly width: number;
 }
 
-export const drawCircle = (props: DrawCircleProps): void => {
+export function drawCircle(props: DrawCircleProps): void {
 	const { canvas, color = "black", size, x, y } = props;
 	const context = canvas?.getContext("2d");
 
@@ -66,9 +66,9 @@ export const drawCircle = (props: DrawCircleProps): void => {
 	context.arc(x, y, size / 2, 0, 2 * Math.PI, false);
 	context.fill();
 	context.restore();
-};
+}
 
-export const drawLine = (props: DrawLineProps): void => {
+export function drawLine(props: DrawLineProps): void {
 	const { canvas, color = "black", fromX, fromY, toX, toY } = props;
 	const context = canvas?.getContext("2d");
 
@@ -81,9 +81,9 @@ export const drawLine = (props: DrawLineProps): void => {
 	context.lineTo(toX, toY);
 	context.stroke();
 	context.restore();
-};
+}
 
-export const drawRectangle = (props: DrawRectangleProps): void => {
+export function drawRectangle(props: DrawRectangleProps): void {
 	const { canvas, color = "black", height, x, y, width } = props;
 	const context = canvas?.getContext("2d");
 
@@ -93,9 +93,9 @@ export const drawRectangle = (props: DrawRectangleProps): void => {
 	context.fillStyle = color;
 	context.fillRect(x, y, width, height);
 	context.restore();
-};
+}
 
-export const drawRectangleOutline = (props: DrawRectangleProps): void => {
+export function drawRectangleOutline(props: DrawRectangleProps): void {
 	const { canvas, color = "black", height, x, y, width } = props;
 	const context = canvas?.getContext("2d");
 
@@ -105,9 +105,9 @@ export const drawRectangleOutline = (props: DrawRectangleProps): void => {
 	context.strokeStyle = color;
 	context.strokeRect(x, y, width, height);
 	context.restore();
-};
+}
 
-export const drawText = (props: DrawTextProps): void => {
+export function drawText(props: DrawTextProps): void {
 	const { align = "left", canvas, color = "black", value, x, y } = props;
 	const context = canvas?.getContext("2d");
 
@@ -121,9 +121,9 @@ export const drawText = (props: DrawTextProps): void => {
 	context.scale(1, -1);
 	context.fillText(value, 0, 0);
 	context.restore();
-};
+}
 
-export const setup = (props: SetupProps): void => {
+export function setup(props: SetupProps): void {
 	const { canvas, height, width } = props;
 	const context = canvas?.getContext("2d");
 
@@ -133,24 +133,27 @@ export const setup = (props: SetupProps): void => {
 	canvas.setAttribute("width", `${width}px`);
 	context.translate(0, height);
 	context.scale(1, -1);
-};
+}
 
-export const renderBarChart = ({
+export function renderBarChart({
+	annotationColor = "blue",
+	barColor = "black",
 	barGap = 0,
 	barWidth = 8,
-	color = "black",
 	highlightColor = "red",
+	layers,
 	min: forceMin,
 	size: canvasHeight,
-	values,
 	zeroColor = "black",
-}: RenderBarChartProps): HTMLCanvasElement => {
+}: RenderBarChartProps): HTMLCanvasElement {
+	const barsLayer = layers.find((layer) => layer.type === "bars");
+	const barsLayerLength = barsLayer?.values.length ?? 0;
 	const canvas = document.createElement("canvas");
+	const canvasWidth = (barsLayerLength - 1) * (barGap + barWidth) + barWidth;
 	// prettier-ignore
-	const items = calculateBarChartItems({ barGap, barWidth, canvasHeight, color, forceMin, values, zeroColor });
+	const items = calculateBarChartItems({ annotationColor, barColor, barGap, barWidth, canvasHeight, forceMin, layers, zeroColor });
 	const portal = document.getElementById("portal-root");
 	const tooltip = document.createElement("div");
-	const canvasWidth = (values.length - 1) * (barGap + barWidth) + barWidth;
 
 	setup({ canvas, height: canvasHeight, width: canvasWidth });
 	tooltip.style.setProperty("background-color", "rgba(60, 60, 60, 0.75)");
@@ -166,8 +169,11 @@ export const renderBarChart = ({
 		const canvasLeft = canvasPosition.left ?? 0;
 		const x = event.clientX;
 		const y = event.clientY;
-		// prettier-ignore
-		const current = items.find((item) => x >= item.x + canvasLeft + canvasClientLeft && x <= item.x + item.width + canvasLeft + canvasClientLeft);
+		const current = items.find(
+			(item) =>
+				x >= item.x + canvasLeft + canvasClientLeft &&
+				x <= item.x + item.width + canvasLeft + canvasClientLeft
+		);
 
 		if (current) {
 			tooltip.innerHTML = current.value.toString();
@@ -179,15 +185,14 @@ export const renderBarChart = ({
 			tooltip?.remove();
 		}
 
-		// @ts-ignore
 		items.forEach((item) => {
 			const active = current?.x === item.x;
-			drawRectangle({ ...item, canvas, color: active ? highlightColor : item.color });
+			const color = active && item.type === "bar" ? highlightColor : item.color;
+			drawRectangle({ ...item, canvas, color });
 		});
 	});
 
 	canvas.addEventListener("mouseout", () => {
-		// @ts-ignore
 		items.forEach((item) => drawRectangle({ ...item, canvas }));
 		tooltip?.remove();
 	});
@@ -195,4 +200,4 @@ export const renderBarChart = ({
 	items.forEach((item) => drawRectangle({ ...item, canvas }));
 
 	return canvas;
-};
+}
