@@ -30,15 +30,18 @@ Executes tests.
 
 <br/>
 
-| Property       | Type     |  Default    | Optional | Description                                                                               |
-| -------------- | -------- | ----------- | -------- | ----------------------------------------------------------------------------------------- |
-| barWidth       | number   | 20          | `true`   | Set chart bars width                                                                      |
-| className      | string   | `undefined` | `true`   | Applies to container                                                                      |
-| color          | string   | black       | `true`   | Set color on chart bars                                                                   |
-| gap            | number   | `undefined` | `true`   | Set space between chart bars                                                              |
-| highlightColor | string   | red         | `true`   | Set highlight color on hover chart bar                                                    |
-| size           | number   | `undefined` | `false`  | Set height to chart (width will be auto-calculated based on `barWidth`, `gap` and `size`) |
-| values         | number[] | `undefined` | `false`  | An array with values that will generate chart bars                                        |
+| Property        | Type                                                  |  Default    | Optional | Description                                                                                |
+| --------------- | ----------------------------------------------------- | ----------- | -------- | ------------------------------------------------------------------------------------------ |
+| annotationColor | string                                                | blue        | `true`   | Set color on chart annotations                                                             |
+| barColor        | string                                                | black       | `true`   | Set color on chart bars                                                                    |
+| barGap          | number                                                | `undefined` | `true`   | Set space between chart bars                                                               |
+| barWidth        | number                                                | 20          | `true`   | Set chart bars width                                                                       |
+| className       | string                                                | `undefined` | `true`   | Applies to container                                                                       |
+| highlightColor  | string                                                | red         | `true`   | Set highlight color on hover chart bar                                                     |
+| layers          | { type: "bars" \| "annotations", values: number[] }[] | `undefined` | `false`  | An array with layers that will generate chart bars and annotations based on type and order |
+| min             | number                                                | `undefined` | `true`   | Force min value allowed                                                                    |
+| size            | number                                                | `undefined` | `false`  | Set height to chart (width will be auto-calculated based on `barWidth`, `gap` and `size`)  |
+| zeroColor       | string                                                | black       | `true`   | Set color on chart values equal to zero                                                    |
 
 ### ScatterPlot
 
