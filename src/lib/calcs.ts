@@ -1,7 +1,12 @@
 import { BarChartItem } from "models/BarChartItem";
 import { BarChartLayer } from "models/BarChartLayer";
+import { ScatterPlotItem } from "models/ScatterPlotItem";
+import { ScatterPlotLayer } from "models/ScatterPlotLayer";
 
+const DEFAULT_POINT_COLOR = "black";
 const MIN_BAR_HEIGHT = 1;
+const MIN_LINE_WIDTH = 1;
+const MIN_POINT_SIZE = 1;
 
 interface CalculateBarChartItemsProps {
 	readonly annotationColor: string;
@@ -12,6 +17,13 @@ interface CalculateBarChartItemsProps {
 	readonly forceMin?: number;
 	readonly layers: readonly BarChartLayer[];
 	readonly zeroColor: string;
+}
+
+interface CalculateScatterPlotItemsProps {
+	readonly canvasSize: number;
+	readonly forceMin?: number;
+	readonly forceMax?: number;
+	readonly layers: readonly ScatterPlotLayer[];
 }
 
 export function calculateBarChartItems({
@@ -76,6 +88,60 @@ export function calculateBarChartItems({
 				}
 
 				items.push({ color, height, type, value, width: barWidth, x, y });
+			}
+		}
+	}
+
+	return items;
+}
+
+export function calculateScatterPlotItems({
+	canvasSize,
+	forceMax,
+	forceMin,
+	layers,
+}: CalculateScatterPlotItemsProps): readonly ScatterPlotItem[] {
+	const items: ScatterPlotItem[] = [];
+	const values = layers.flatMap((lr) => [...lr.x, ...lr.y]);
+	const max = forceMax ?? Math.max(...values);
+	const min = forceMin ?? Math.min(...values);
+	const range = max - min;
+
+	for (const layer of layers) {
+		if (layer.type === "line") {
+			const width = layer.width ?? MIN_LINE_WIDTH;
+
+			for (let i = 0; i < layer.x.length - 1; i++) {
+				items.push({
+					color: layer.color,
+					fromX: Math.round(((layer.x[i] - min) * canvasSize) / range - width / 2),
+					fromY: Math.round(((layer.y[i] - min) * canvasSize) / range - width / 2),
+					strokeWidth: layer.width,
+					toX: Math.round(((layer.x[i + 1] - min) * canvasSize) / range - width / 2),
+					toY: Math.round(((layer.y[i + 1] - min) * canvasSize) / range - width / 2),
+					type: layer.type,
+				});
+			}
+		} else {
+			for (let i = 0; i < layer.x.length; i++) {
+				const color = layer.color ?? DEFAULT_POINT_COLOR;
+				const size = layer.size ?? MIN_POINT_SIZE;
+				const xValue = layer.x[i] ?? 0;
+				const xPosition = Math.round(((xValue - min) * canvasSize) / range - size / 2);
+				const yValue = layer.y[i] ?? 0;
+				const yPosition = Math.round(((yValue - min) * canvasSize) / range - size / 2);
+				const textValue = `${xValue},${yValue}`;
+
+				items.push({
+					defaultColor: color,
+					color,
+					highlightColor: layer.highlightColor,
+					size,
+					type: layer.type,
+					value: textValue,
+					x: range === 0 ? 0 : Math.abs(xPosition),
+					y: range === 0 ? 0 : Math.abs(yPosition),
+				});
 			}
 		}
 	}

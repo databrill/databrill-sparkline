@@ -1,7 +1,13 @@
 import { BarChartLayer } from "models/BarChartLayer";
-import { calculateBarChartItems } from "./calcs";
+import { ScatterPlotItem } from "models/ScatterPlotItem";
+import { ScatterPlotLayer } from "models/ScatterPlotLayer";
+import { calculateBarChartItems, calculateScatterPlotItems } from "./calcs";
 
-interface DrawCircleProps {
+export interface ClearProps {
+	readonly canvas: HTMLCanvasElement | null;
+}
+
+export interface DrawCircleProps {
 	readonly canvas: HTMLCanvasElement | null;
 	readonly color?: string;
 	readonly x: number;
@@ -9,16 +15,17 @@ interface DrawCircleProps {
 	readonly size: number;
 }
 
-interface DrawLineProps {
+export interface DrawLineProps {
 	readonly canvas: HTMLCanvasElement | null;
 	readonly color?: string;
 	readonly fromX: number;
 	readonly fromY: number;
+	readonly strokeWidth?: number;
 	readonly toX: number;
 	readonly toY: number;
 }
 
-interface DrawRectangleProps {
+export interface DrawRectangleProps {
 	readonly canvas: HTMLCanvasElement | null;
 	readonly color?: string;
 	readonly height: number;
@@ -27,7 +34,7 @@ interface DrawRectangleProps {
 	readonly width: number;
 }
 
-interface DrawTextProps {
+export interface DrawTextProps {
 	readonly align?: "center" | "left" | "right";
 	readonly canvas: HTMLCanvasElement | null;
 	readonly color?: string;
@@ -48,17 +55,31 @@ export interface RenderBarChartProps {
 	readonly zeroColor?: string;
 }
 
-interface SetupProps {
+export interface RenderScatterPlotProps {
+	readonly layers: readonly ScatterPlotLayer[];
+	readonly max?: number;
+	readonly min?: number;
+	readonly size: number;
+}
+
+export interface SetupProps {
 	readonly canvas: HTMLCanvasElement | null;
 	readonly height: number;
 	readonly width: number;
+}
+
+export function clear(props: ClearProps): void {
+	const { canvas } = props;
+	const context = canvas?.getContext("2d");
+
+	context?.clearRect(0, 0, canvas?.width ?? 0, canvas?.height ?? 0);
 }
 
 export function drawCircle(props: DrawCircleProps): void {
 	const { canvas, color = "black", size, x, y } = props;
 	const context = canvas?.getContext("2d");
 
-	if (!(canvas && context)) return;
+	if (!context) return;
 
 	context.save();
 	context.beginPath();
@@ -69,13 +90,14 @@ export function drawCircle(props: DrawCircleProps): void {
 }
 
 export function drawLine(props: DrawLineProps): void {
-	const { canvas, color = "black", fromX, fromY, toX, toY } = props;
+	const { canvas, color = "black", fromX, fromY, strokeWidth, toX, toY } = props;
 	const context = canvas?.getContext("2d");
 
-	if (!(canvas && context)) return;
+	if (!context) return;
 
 	context.save();
 	context.beginPath();
+	context.lineWidth = strokeWidth ?? 1;
 	context.strokeStyle = color;
 	context.moveTo(fromX, fromY);
 	context.lineTo(toX, toY);
@@ -87,7 +109,7 @@ export function drawRectangle(props: DrawRectangleProps): void {
 	const { canvas, color = "black", height, x, y, width } = props;
 	const context = canvas?.getContext("2d");
 
-	if (!(canvas && context)) return;
+	if (!context) return;
 
 	context.save();
 	context.fillStyle = color;
@@ -99,7 +121,7 @@ export function drawRectangleOutline(props: DrawRectangleProps): void {
 	const { canvas, color = "black", height, x, y, width } = props;
 	const context = canvas?.getContext("2d");
 
-	if (!(canvas && context)) return;
+	if (!context) return;
 
 	context.save();
 	context.strokeStyle = color;
@@ -111,7 +133,7 @@ export function drawText(props: DrawTextProps): void {
 	const { align = "left", canvas, color = "black", value, x, y } = props;
 	const context = canvas?.getContext("2d");
 
-	if (!(canvas && context)) return;
+	if (!context) return;
 
 	context.save();
 	context.fillStyle = color;
@@ -127,10 +149,10 @@ export function setup(props: SetupProps): void {
 	const { canvas, height, width } = props;
 	const context = canvas?.getContext("2d");
 
-	if (!(canvas && context)) return;
+	if (!context) return;
 
-	canvas.setAttribute("height", `${height}px`);
-	canvas.setAttribute("width", `${width}px`);
+	canvas?.setAttribute("height", `${height}px`);
+	canvas?.setAttribute("width", `${width}px`);
 	context.translate(0, height);
 	context.scale(1, -1);
 }
@@ -198,6 +220,90 @@ export function renderBarChart({
 	});
 
 	items.forEach((item) => drawRectangle({ ...item, canvas }));
+
+	return canvas;
+}
+
+export function renderScatterPlot({
+	layers,
+	max: forceMax,
+	min: forceMin,
+	size: canvasSize,
+}: RenderScatterPlotProps): HTMLCanvasElement {
+	const canvas = document.createElement("canvas");
+	const items = calculateScatterPlotItems({ canvasSize, forceMax, forceMin, layers });
+	const portal = document.getElementById("portal-root");
+	const tooltip = document.createElement("div");
+
+	setup({ canvas, height: canvasSize, width: canvasSize });
+	tooltip.style.setProperty("background-color", "rgba(60, 60, 60, 0.75)");
+	tooltip.style.setProperty("color", "white");
+	tooltip.style.setProperty("font-size", "12px");
+	tooltip.style.setProperty("padding", "2px 8px");
+	tooltip.style.setProperty("position", "absolute");
+	tooltip.style.setProperty("text-align", "center");
+
+	const render = (items: readonly ScatterPlotItem[]) => {
+		items.forEach((item) => {
+			if (item.type === "line") drawLine({ ...item, canvas });
+			else if (item.type === "plot") drawCircle({ ...item, canvas });
+		});
+	};
+
+	canvas.addEventListener("mousemove", (event) => {
+		const canvasPosition = canvas.getBoundingClientRect();
+		const canvasLeft = canvasPosition?.left ?? 0;
+		const canvasTop = canvasPosition?.top ?? 0;
+		const x = event.clientX;
+		const y = event.clientY;
+		const current = items.find(
+			(item) =>
+				item.type === "plot" &&
+				x >= item.x - item.size / 2 + canvasLeft &&
+				x <= item.x + item.size / 2 + canvasLeft &&
+				canvasSize + canvasTop - y >= item.y - item.size / 2 &&
+				canvasSize + canvasTop - y <= item.y + item.size / 2
+		);
+
+		if (current && current.type === "plot") {
+			tooltip.innerHTML = current.value.toString();
+			tooltip.setAttribute("aria-label", current.value.toString());
+			tooltip.style.setProperty("left", `${x + 8}px`);
+			tooltip.style.setProperty("top", `${y - 16}px`);
+			portal?.appendChild(tooltip);
+		} else {
+			tooltip?.remove();
+		}
+
+		clear({ canvas });
+		render(
+			items.map((item) =>
+				item.type === "plot"
+					? {
+							...item,
+							color:
+								current?.type === "plot" &&
+								item.type === "plot" &&
+								current.x === item.x
+									? item.highlightColor
+									: item.defaultColor,
+					  }
+					: item
+			)
+		);
+	});
+
+	canvas.addEventListener("mouseout", () => {
+		clear({ canvas });
+		render(
+			items.map((item) =>
+				item.type === "plot" ? { ...item, color: item.defaultColor } : item
+			)
+		);
+		tooltip?.remove();
+	});
+
+	render(items);
 
 	return canvas;
 }
