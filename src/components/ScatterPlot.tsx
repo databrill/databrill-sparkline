@@ -11,8 +11,8 @@ import { Tooltip, TooltipProps } from "./Tooltip";
 export interface ScatterPlotProps {
 	readonly className?: string;
 	readonly layers: readonly ScatterPlotLayer[];
-	readonly min?: number;
-	readonly max?: number;
+	readonly max?: [x?: number, y?: number];
+	readonly min?: [x?: number, y?: number];
 	readonly size: number;
 }
 

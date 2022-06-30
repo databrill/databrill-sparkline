@@ -102,7 +102,7 @@ describe("calcs", () => {
 					size: 1,
 					type,
 					value: "0,0",
-					x: 19,
+					x: 12,
 					y: 19,
 				},
 				{
@@ -112,7 +112,7 @@ describe("calcs", () => {
 					size: 1,
 					type,
 					value: "-1,1",
-					x: 9,
+					x: 0,
 					y: 28,
 				},
 				{
@@ -122,7 +122,7 @@ describe("calcs", () => {
 					size: 1,
 					type,
 					value: "2,-2",
-					x: 38,
+					x: 36,
 					y: 0,
 				},
 				{

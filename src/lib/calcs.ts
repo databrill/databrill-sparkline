@@ -21,8 +21,8 @@ interface CalculateBarChartItemsProps {
 
 interface CalculateScatterPlotItemsProps {
 	readonly canvasSize: number;
-	readonly forceMin?: number;
-	readonly forceMax?: number;
+	readonly forceMin?: [x?: number, y?: number];
+	readonly forceMax?: [x?: number, y?: number];
 	readonly layers: readonly ScatterPlotLayer[];
 }
 
@@ -102,10 +102,14 @@ export function calculateScatterPlotItems({
 	layers,
 }: CalculateScatterPlotItemsProps): readonly ScatterPlotItem[] {
 	const items: ScatterPlotItem[] = [];
-	const values = layers.flatMap((lr) => [...lr.x, ...lr.y]);
-	const max = forceMax ?? Math.max(...values);
-	const min = forceMin ?? Math.min(...values);
-	const range = max - min;
+	const valuesX = layers.flatMap((lr) => [...lr.x]);
+	const valuesY = layers.flatMap((lr) => [...lr.y]);
+	const maxX = forceMax?.[0] ?? Math.max(...valuesX);
+	const minX = forceMin?.[0] ?? Math.min(...valuesX);
+	const maxY = forceMax?.[1] ?? Math.max(...valuesY);
+	const minY = forceMin?.[1] ?? Math.min(...valuesY);
+	const rangeX = maxX - minX;
+	const rangeY = maxY - minY;
 
 	for (const layer of layers) {
 		if (layer.type === "line") {
@@ -114,11 +118,11 @@ export function calculateScatterPlotItems({
 			for (let i = 0; i < layer.x.length - 1; i++) {
 				items.push({
 					color: layer.color,
-					fromX: Math.round(((layer.x[i] - min) * canvasSize) / range - width / 2),
-					fromY: Math.round(((layer.y[i] - min) * canvasSize) / range - width / 2),
+					fromX: Math.round(((layer.x[i] - minX) * canvasSize) / rangeX - width / 2),
+					fromY: Math.round(((layer.y[i] - minY) * canvasSize) / rangeY - width / 2),
 					strokeWidth: layer.width,
-					toX: Math.round(((layer.x[i + 1] - min) * canvasSize) / range - width / 2),
-					toY: Math.round(((layer.y[i + 1] - min) * canvasSize) / range - width / 2),
+					toX: Math.round(((layer.x[i + 1] - minX) * canvasSize) / rangeX - width / 2),
+					toY: Math.round(((layer.y[i + 1] - minY) * canvasSize) / rangeY - width / 2),
 					type: layer.type,
 				});
 			}
@@ -127,9 +131,9 @@ export function calculateScatterPlotItems({
 				const color = layer.color ?? DEFAULT_POINT_COLOR;
 				const size = layer.size ?? MIN_POINT_SIZE;
 				const xValue = layer.x[i] ?? 0;
-				const xPosition = Math.round(((xValue - min) * canvasSize) / range - size / 2);
+				const xPosition = Math.round(((xValue - minX) * canvasSize) / rangeX - size / 2);
 				const yValue = layer.y[i] ?? 0;
-				const yPosition = Math.round(((yValue - min) * canvasSize) / range - size / 2);
+				const yPosition = Math.round(((yValue - minY) * canvasSize) / rangeY - size / 2);
 				const textValue = `${xValue},${yValue}`;
 
 				items.push({
@@ -139,8 +143,8 @@ export function calculateScatterPlotItems({
 					size,
 					type: layer.type,
 					value: textValue,
-					x: range === 0 ? 0 : Math.abs(xPosition),
-					y: range === 0 ? 0 : Math.abs(yPosition),
+					x: rangeX === 0 ? 0 : Math.abs(xPosition),
+					y: rangeY === 0 ? 0 : Math.abs(yPosition),
 				});
 			}
 		}

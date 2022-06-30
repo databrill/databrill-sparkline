@@ -57,8 +57,8 @@ export interface RenderBarChartProps {
 
 export interface RenderScatterPlotProps {
 	readonly layers: readonly ScatterPlotLayer[];
-	readonly max?: number;
-	readonly min?: number;
+	readonly max?: [x?: number, y?: number];
+	readonly min?: [x?: number, y?: number];
 	readonly size: number;
 }
 
