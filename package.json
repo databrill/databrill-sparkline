@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"scripts": {
 		"build": "vite build && tsc -p tsconfig.production.json",
-		"dev": "vite --port $PORT",
+		"dev": "vite",
 		"lint": "tsc && eslint ./src/**/*.ts{,x} --fix",
 		"setup": "sh ./scripts/setup.sh",
 		"test": "jest"
