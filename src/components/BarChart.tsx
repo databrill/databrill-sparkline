@@ -35,7 +35,7 @@ export const BarChart = memo(
 	}: BarChartProps): JSX.Element => {
 		const [showTooltip, setShowTooltip] = useState<boolean>(false);
 		const [tooltipProps, setTooltipProps] = useState<TooltipProps | null>(null);
-		const ref = useRef<HTMLCanvasElement>(null);
+		const ref = useRef<HTMLCanvasElement | null>(null);
 
 		const items = useMemo(
 			() =>
@@ -91,9 +91,13 @@ export const BarChart = memo(
 		useEffect(() => {
 			const barsLayer = layers.find((layer) => layer.type === "bars");
 			const barsLayerLength = barsLayer?.values.length ?? 0;
-			const canvasWidth = (barsLayerLength - 1) * (barWidth + barGap) + barWidth;
 
-			setup({ canvas: ref.current, height: canvasHeight, width: canvasWidth });
+			setup({
+				backgroundColor: "white",
+				canvas: ref.current,
+				height: canvasHeight,
+				width: (barsLayerLength - 1) * (barWidth + barGap) + barWidth,
+			});
 		}, [barGap, barWidth, canvasHeight, layers]);
 
 		useEffect(() => {

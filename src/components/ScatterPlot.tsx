@@ -9,6 +9,7 @@ import { Tooltip, TooltipProps } from "./Tooltip";
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 
 export interface ScatterPlotProps {
+	readonly backgroundColor?: string;
 	readonly className?: string;
 	readonly layers: readonly ScatterPlotLayer[];
 	readonly max?: [x?: number, y?: number];
@@ -18,13 +19,14 @@ export interface ScatterPlotProps {
 
 export const ScatterPlot = memo(
 	({
+		backgroundColor = "white",
 		className,
 		layers,
 		max: forceMax,
 		min: forceMin,
 		size: canvasSize,
 	}: ScatterPlotProps): JSX.Element => {
-		const ref = useRef<HTMLCanvasElement>(null);
+		const ref = useRef<HTMLCanvasElement | null>(null);
 		const [items, setItems] = useState<readonly ScatterPlotItem[]>(
 			calculateScatterPlotItems({ canvasSize, forceMax, forceMin, layers })
 		);
@@ -84,8 +86,8 @@ export const ScatterPlot = memo(
 		}, [handleMouseMove]);
 
 		useEffect(() => {
-			setup({ canvas: ref.current, height: canvasSize, width: canvasSize });
-		}, [canvasSize]);
+			setup({ backgroundColor, canvas: ref.current, height: canvasSize, width: canvasSize });
+		}, [backgroundColor, canvasSize]);
 
 		useEffect(() => {
 			clear({ canvas: ref.current });

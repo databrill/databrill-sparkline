@@ -56,6 +56,7 @@ export interface RenderBarChartProps {
 }
 
 export interface RenderScatterPlotProps {
+	readonly backgroundColor?: string;
 	readonly layers: readonly ScatterPlotLayer[];
 	readonly max?: [x?: number, y?: number];
 	readonly min?: [x?: number, y?: number];
@@ -63,6 +64,7 @@ export interface RenderScatterPlotProps {
 }
 
 export interface SetupProps {
+	readonly backgroundColor: string;
 	readonly canvas: HTMLCanvasElement | null;
 	readonly height: number;
 	readonly width: number;
@@ -72,7 +74,9 @@ export function clear(props: ClearProps): void {
 	const { canvas } = props;
 	const context = canvas?.getContext("2d");
 
-	context?.clearRect(0, 0, canvas?.width ?? 0, canvas?.height ?? 0);
+	if (!canvas || !context) return;
+
+	context.clearRect(0, 0, canvas?.width ?? 0, canvas?.height ?? 0);
 }
 
 export function drawCircle(props: DrawCircleProps): void {
@@ -146,13 +150,14 @@ export function drawText(props: DrawTextProps): void {
 }
 
 export function setup(props: SetupProps): void {
-	const { canvas, height, width } = props;
+	const { backgroundColor, canvas, height, width } = props;
 	const context = canvas?.getContext("2d");
 
-	if (!context) return;
+	if (!canvas || !context) return;
 
-	canvas?.setAttribute("height", `${height}px`);
-	canvas?.setAttribute("width", `${width}px`);
+	canvas.setAttribute("height", `${height}px`);
+	canvas.setAttribute("width", `${width}px`);
+	canvas.style.setProperty("background-color", backgroundColor);
 	context.translate(0, height);
 	context.scale(1, -1);
 }
@@ -177,7 +182,7 @@ export function renderBarChart({
 	const portal = document.getElementById("portal-root");
 	const tooltip = document.createElement("div");
 
-	setup({ canvas, height: canvasHeight, width: canvasWidth });
+	setup({ backgroundColor: "white", canvas, height: canvasHeight, width: canvasWidth });
 	tooltip.style.setProperty("background-color", "rgba(60, 60, 60, 0.75)");
 	tooltip.style.setProperty("color", "white");
 	tooltip.style.setProperty("font-size", "12px");
@@ -225,6 +230,7 @@ export function renderBarChart({
 }
 
 export function renderScatterPlot({
+	backgroundColor = "white",
 	layers,
 	max: forceMax,
 	min: forceMin,
@@ -235,7 +241,7 @@ export function renderScatterPlot({
 	const portal = document.getElementById("portal-root");
 	const tooltip = document.createElement("div");
 
-	setup({ canvas, height: canvasSize, width: canvasSize });
+	setup({ backgroundColor, canvas, height: canvasSize, width: canvasSize });
 	tooltip.style.setProperty("background-color", "rgba(60, 60, 60, 0.75)");
 	tooltip.style.setProperty("color", "white");
 	tooltip.style.setProperty("font-size", "12px");
