@@ -149,7 +149,7 @@ describe("calcs", () => {
 
 	describe("calculateScatterPlotItems", () => {
 		const color = "black";
-		const common = { canvasSize: 48, pointColor: "black", pointSize: 1 };
+		const common = { canvasSize: 48 };
 		const type: "plot" = "plot";
 
 		it("must calculate scatter plot items correctly when both", () => {
@@ -185,6 +185,55 @@ describe("calcs", () => {
 					value: "2,-2",
 					x: 36,
 					y: 0,
+				},
+				{
+					color,
+					defaultColor: color,
+					highlightColor: undefined,
+					size: 1,
+					type,
+					value: "3,3",
+					x: 48,
+					y: 48,
+				},
+			];
+
+			expect(calculateScatterPlotItems(input)).toStrictEqual(output);
+		});
+
+		it("must calculate scatter plot items correctly when logarithmic", () => {
+			const layers = [{ type, x: [0, 1, 2, 3], y: [0, 1, 2, 3] }];
+			const input = { ...common, layers, xLogBase: Math.E, yLogBase: Math.E };
+			const output = [
+				{
+					color,
+					defaultColor: color,
+					highlightColor: undefined,
+					size: 1,
+					type,
+					value: "0,0",
+					x: 0,
+					y: 0,
+				},
+				{
+					color,
+					defaultColor: color,
+					highlightColor: undefined,
+					size: 1,
+					type,
+					value: "1,1",
+					x: 0,
+					y: 0,
+				},
+				{
+					color,
+					defaultColor: color,
+					highlightColor: undefined,
+					size: 1,
+					type,
+					value: "2,2",
+					x: 30,
+					y: 30,
 				},
 				{
 					color,

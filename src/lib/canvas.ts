@@ -63,6 +63,8 @@ export interface RenderScatterPlotProps {
 	readonly min?: [x?: number, y?: number];
 	readonly size: number;
 	readonly valueFormatter?: (value: [x: number, y: number], index: number) => string;
+	readonly xLogBase?: number;
+	readonly yLogBase?: number;
 }
 
 export interface SetupProps {

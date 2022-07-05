@@ -16,6 +16,8 @@ export interface ScatterPlotProps {
 	readonly min?: [x?: number, y?: number];
 	readonly size: number;
 	readonly valueFormatter?: (value: [x: number, y: number], index: number) => string;
+	readonly xLogBase?: number;
+	readonly yLogBase?: number;
 }
 
 export const ScatterPlot = memo(
@@ -27,11 +29,11 @@ export const ScatterPlot = memo(
 		min: forceMin,
 		size: canvasSize,
 		valueFormatter,
+		xLogBase,
+		yLogBase,
 	}: ScatterPlotProps): JSX.Element => {
 		const ref = useRef<HTMLCanvasElement | null>(null);
-		const [items, setItems] = useState<readonly ScatterPlotItem[]>(
-			calculateScatterPlotItems({ canvasSize, forceMax, forceMin, layers, valueFormatter })
-		);
+		const [items, setItems] = useState<readonly ScatterPlotItem[]>([]);
 		const [showTooltip, setShowTooltip] = useState<boolean>(false);
 		const [tooltipProps, setTooltipProps] = useState<TooltipProps | null>(null);
 
@@ -54,22 +56,23 @@ export const ScatterPlot = memo(
 				if (current && current.type === "plot") {
 					setTooltipProps({ left: x + 8, top: y - 16, value: current?.value });
 					setShowTooltip(true);
-					setItems((prev) =>
-						prev.map((item) =>
-							item.type === "plot"
-								? {
-										...item,
-										color:
-											current?.x === item.x
-												? item.highlightColor
-												: item.defaultColor,
-								  }
-								: item
-						)
-					);
 				} else {
 					setShowTooltip(false);
 				}
+
+				setItems((prev) =>
+					prev.map((item) =>
+						item.type === "plot"
+							? {
+									...item,
+									color:
+										current?.type === "plot" && current.x === item.x
+											? item.highlightColor
+											: item.defaultColor,
+							  }
+							: item
+					)
+				);
 			},
 			[canvasSize, items]
 		);
@@ -95,6 +98,20 @@ export const ScatterPlot = memo(
 				else if (item.type === "plot") drawCircle({ ...item, canvas: ref.current });
 			});
 		}, [items]);
+
+		useEffect(() => {
+			setItems(
+				calculateScatterPlotItems({
+					canvasSize,
+					forceMax,
+					forceMin,
+					layers,
+					valueFormatter,
+					xLogBase,
+					yLogBase,
+				})
+			);
+		}, [canvasSize, forceMax, forceMin, layers, valueFormatter, xLogBase, yLogBase]);
 
 		return (
 			<div className={className} style={{ display: "inline-flex", position: "relative" }}>
