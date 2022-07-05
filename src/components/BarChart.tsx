@@ -17,6 +17,7 @@ export interface BarChartProps {
 	readonly layers: readonly BarChartLayer[];
 	readonly min?: number;
 	readonly size: number;
+	readonly valueFormatter?: (value: number) => string;
 	readonly zeroColor?: string;
 }
 
@@ -31,6 +32,7 @@ export const BarChart = memo(
 		layers,
 		min: forceMin,
 		size: canvasHeight,
+		valueFormatter,
 		zeroColor = "black",
 	}: BarChartProps): JSX.Element => {
 		const [showTooltip, setShowTooltip] = useState<boolean>(false);
@@ -47,9 +49,20 @@ export const BarChart = memo(
 					canvasHeight,
 					forceMin,
 					layers,
+					valueFormatter,
 					zeroColor,
 				}),
-			[annotationColor, barColor, barGap, barWidth, canvasHeight, forceMin, layers, zeroColor]
+			[
+				annotationColor,
+				barColor,
+				barGap,
+				barWidth,
+				canvasHeight,
+				forceMin,
+				layers,
+				valueFormatter,
+				zeroColor,
+			]
 		);
 
 		const handleMouseMove = useDebounceCallback(

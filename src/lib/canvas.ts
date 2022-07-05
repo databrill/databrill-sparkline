@@ -52,6 +52,7 @@ export interface RenderBarChartProps {
 	readonly layers: readonly BarChartLayer[];
 	readonly min?: number;
 	readonly size: number;
+	readonly valueFormatter?: (value: number) => string;
 	readonly zeroColor?: string;
 }
 
@@ -61,6 +62,7 @@ export interface RenderScatterPlotProps {
 	readonly max?: [x?: number, y?: number];
 	readonly min?: [x?: number, y?: number];
 	readonly size: number;
+	readonly valueFormatter?: (value: [x: number, y: number]) => string;
 }
 
 export interface SetupProps {
@@ -171,14 +173,24 @@ export function renderBarChart({
 	layers,
 	min: forceMin,
 	size: canvasHeight,
+	valueFormatter,
 	zeroColor = "black",
 }: RenderBarChartProps): HTMLCanvasElement {
 	const barsLayer = layers.find((layer) => layer.type === "bars");
 	const barsLayerLength = barsLayer?.values.length ?? 0;
 	const canvas = document.createElement("canvas");
 	const canvasWidth = (barsLayerLength - 1) * (barGap + barWidth) + barWidth;
-	// prettier-ignore
-	const items = calculateBarChartItems({ annotationColor, barColor, barGap, barWidth, canvasHeight, forceMin, layers, zeroColor });
+	const items = calculateBarChartItems({
+		annotationColor,
+		barColor,
+		barGap,
+		barWidth,
+		canvasHeight,
+		forceMin,
+		layers,
+		valueFormatter,
+		zeroColor,
+	});
 	const portal = document.getElementById("portal-root");
 	const tooltip = document.createElement("div");
 
@@ -235,9 +247,16 @@ export function renderScatterPlot({
 	max: forceMax,
 	min: forceMin,
 	size: canvasSize,
+	valueFormatter,
 }: RenderScatterPlotProps): HTMLCanvasElement {
 	const canvas = document.createElement("canvas");
-	const items = calculateScatterPlotItems({ canvasSize, forceMax, forceMin, layers });
+	const items = calculateScatterPlotItems({
+		canvasSize,
+		forceMax,
+		forceMin,
+		layers,
+		valueFormatter,
+	});
 	const portal = document.getElementById("portal-root");
 	const tooltip = document.createElement("div");
 

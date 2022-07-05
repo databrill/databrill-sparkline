@@ -15,6 +15,7 @@ export interface ScatterPlotProps {
 	readonly max?: [x?: number, y?: number];
 	readonly min?: [x?: number, y?: number];
 	readonly size: number;
+	readonly valueFormatter?: (value: [x: number, y: number]) => string;
 }
 
 export const ScatterPlot = memo(
@@ -25,10 +26,11 @@ export const ScatterPlot = memo(
 		max: forceMax,
 		min: forceMin,
 		size: canvasSize,
+		valueFormatter,
 	}: ScatterPlotProps): JSX.Element => {
 		const ref = useRef<HTMLCanvasElement | null>(null);
 		const [items, setItems] = useState<readonly ScatterPlotItem[]>(
-			calculateScatterPlotItems({ canvasSize, forceMax, forceMin, layers })
+			calculateScatterPlotItems({ canvasSize, forceMax, forceMin, layers, valueFormatter })
 		);
 		const [showTooltip, setShowTooltip] = useState<boolean>(false);
 		const [tooltipProps, setTooltipProps] = useState<TooltipProps | null>(null);
@@ -52,25 +54,22 @@ export const ScatterPlot = memo(
 				if (current && current.type === "plot") {
 					setTooltipProps({ left: x + 8, top: y - 16, value: current?.value });
 					setShowTooltip(true);
+					setItems((prev) =>
+						prev.map((item) =>
+							item.type === "plot"
+								? {
+										...item,
+										color:
+											current?.x === item.x
+												? item.highlightColor
+												: item.defaultColor,
+								  }
+								: item
+						)
+					);
 				} else {
 					setShowTooltip(false);
 				}
-
-				setItems((prev) =>
-					current?.type === "plot"
-						? prev.map((item) =>
-								item.type === "plot"
-									? {
-											...item,
-											color:
-												current.x === item.x
-													? item.highlightColor
-													: item.defaultColor,
-									  }
-									: item
-						  )
-						: prev
-				);
 			},
 			[canvasSize, items]
 		);

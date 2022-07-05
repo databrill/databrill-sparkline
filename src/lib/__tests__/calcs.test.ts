@@ -17,10 +17,10 @@ describe("calcs", () => {
 			const layers = [{ type: "bars" as "bars", values: [0, -0.1, 0.2, -0.3] }];
 			const input = { ...common, layers };
 			const output = [
-				{ color: "blue", height: 1, type: "bar", value: 0, width: 1, x: 0, y: 29 },
-				{ color: "black", height: 10, type: "bar", value: -0.1, width: 1, x: 2, y: 19 },
-				{ color: "black", height: 19, type: "bar", value: 0.2, width: 1, x: 4, y: 29 },
-				{ color: "black", height: 29, type: "bar", value: -0.3, width: 1, x: 6, y: 0 },
+				{ color: "blue", height: 1, type: "bar", value: "0", width: 1, x: 0, y: 29 },
+				{ color: "black", height: 10, type: "bar", value: "-0.1", width: 1, x: 2, y: 19 },
+				{ color: "black", height: 19, type: "bar", value: "0.2", width: 1, x: 4, y: 29 },
+				{ color: "black", height: 29, type: "bar", value: "-0.3", width: 1, x: 6, y: 0 },
 			];
 
 			expect(calculateBarChartItems(input)).toStrictEqual(output);
@@ -30,10 +30,10 @@ describe("calcs", () => {
 			const layers = [{ type: "bars" as "bars", values: [0, -0.1, -0.2, -0.3] }];
 			const input = { ...common, layers };
 			const output = [
-				{ color: "blue", height: 1, type: "bar", value: 0, width: 1, x: 0, y: 48 },
-				{ color: "black", height: 16, type: "bar", value: -0.1, width: 1, x: 2, y: 32 },
-				{ color: "black", height: 32, type: "bar", value: -0.2, width: 1, x: 4, y: 16 },
-				{ color: "black", height: 48, type: "bar", value: -0.3, width: 1, x: 6, y: 0 },
+				{ color: "blue", height: 1, type: "bar", value: "0", width: 1, x: 0, y: 48 },
+				{ color: "black", height: 16, type: "bar", value: "-0.1", width: 1, x: 2, y: 32 },
+				{ color: "black", height: 32, type: "bar", value: "-0.2", width: 1, x: 4, y: 16 },
+				{ color: "black", height: 48, type: "bar", value: "-0.3", width: 1, x: 6, y: 0 },
 			];
 
 			expect(calculateBarChartItems(input)).toStrictEqual(output);
@@ -43,10 +43,10 @@ describe("calcs", () => {
 			const layers = [{ type: "bars" as "bars", values: [0, 0.1, 0.2, 0.3] }];
 			const input = { ...common, layers };
 			const output = [
-				{ color: "blue", height: 1, type: "bar", value: 0, width: 1, x: 0, y: 0 },
-				{ color: "black", height: 16, type: "bar", value: 0.1, width: 1, x: 2, y: 0 },
-				{ color: "black", height: 32, type: "bar", value: 0.2, width: 1, x: 4, y: 0 },
-				{ color: "black", height: 48, type: "bar", value: 0.3, width: 1, x: 6, y: 0 },
+				{ color: "blue", height: 1, type: "bar", value: "0", width: 1, x: 0, y: 0 },
+				{ color: "black", height: 16, type: "bar", value: "0.1", width: 1, x: 2, y: 0 },
+				{ color: "black", height: 32, type: "bar", value: "0.2", width: 1, x: 4, y: 0 },
+				{ color: "black", height: 48, type: "bar", value: "0.3", width: 1, x: 6, y: 0 },
 			];
 
 			expect(calculateBarChartItems(input)).toStrictEqual(output);
@@ -56,10 +56,10 @@ describe("calcs", () => {
 			const layers = [{ type: "bars" as "bars", values: [0, 0, 0, 0] }];
 			const input = { ...common, layers };
 			const output = [
-				{ color: "blue", height: 1, type: "bar", value: 0, width: 1, x: 0, y: 0 },
-				{ color: "blue", height: 1, type: "bar", value: 0, width: 1, x: 2, y: 0 },
-				{ color: "blue", height: 1, type: "bar", value: 0, width: 1, x: 4, y: 0 },
-				{ color: "blue", height: 1, type: "bar", value: 0, width: 1, x: 6, y: 0 },
+				{ color: "blue", height: 1, type: "bar", value: "0", width: 1, x: 0, y: 0 },
+				{ color: "blue", height: 1, type: "bar", value: "0", width: 1, x: 2, y: 0 },
+				{ color: "blue", height: 1, type: "bar", value: "0", width: 1, x: 4, y: 0 },
+				{ color: "blue", height: 1, type: "bar", value: "0", width: 1, x: 6, y: 0 },
 			];
 
 			expect(calculateBarChartItems(input)).toStrictEqual(output);
@@ -72,14 +72,75 @@ describe("calcs", () => {
 			];
 			const input = { ...common, layers };
 			const output = [
-				{ color: "blue", height: 1, type: "bar", value: 0, width: 1, x: 0, y: 0 },
-				{ color: "black", height: 16, type: "bar", value: 5, width: 1, x: 2, y: 0 },
-				{ color: "black", height: 32, type: "bar", value: 10, width: 1, x: 4, y: 0 },
-				{ color: "black", height: 48, type: "bar", value: 15, width: 1, x: 6, y: 0 },
-				{ color: "blue", height: 1, type: "annotation", value: 0, width: 1, x: 0, y: 0 },
-				{ color: "blue", height: 1, type: "annotation", value: 5, width: 1, x: 2, y: 15 },
-				{ color: "blue", height: 1, type: "annotation", value: 10, width: 1, x: 4, y: 31 },
-				{ color: "blue", height: 1, type: "annotation", value: 15, width: 1, x: 6, y: 47 },
+				{ color: "blue", height: 1, type: "bar", value: "0", width: 1, x: 0, y: 0 },
+				{ color: "black", height: 16, type: "bar", value: "5", width: 1, x: 2, y: 0 },
+				{ color: "black", height: 32, type: "bar", value: "10", width: 1, x: 4, y: 0 },
+				{ color: "black", height: 48, type: "bar", value: "15", width: 1, x: 6, y: 0 },
+				{ color: "blue", height: 1, type: "annotation", value: "0", width: 1, x: 0, y: 0 },
+				{ color: "blue", height: 1, type: "annotation", value: "5", width: 1, x: 2, y: 15 },
+				{
+					color: "blue",
+					height: 1,
+					type: "annotation",
+					value: "10",
+					width: 1,
+					x: 4,
+					y: 31,
+				},
+				{
+					color: "blue",
+					height: 1,
+					type: "annotation",
+					value: "15",
+					width: 1,
+					x: 6,
+					y: 47,
+				},
+			];
+
+			expect(calculateBarChartItems(input)).toStrictEqual(output);
+		});
+
+		it("must format values if value formatter", () => {
+			const layers = [{ type: "bars" as "bars", values: [0, -0.1, 0.2, -0.3] }];
+			const input = { ...common, layers, valueFormatter: (value: number) => `🙂 ${value}` };
+			const output = [
+				{
+					color: "blue",
+					height: 1,
+					type: "bar",
+					value: "🙂 0",
+					width: 1,
+					x: 0,
+					y: 29,
+				},
+				{
+					color: "black",
+					height: 10,
+					type: "bar",
+					value: "🙂 -0.1",
+					width: 1,
+					x: 2,
+					y: 19,
+				},
+				{
+					color: "black",
+					height: 19,
+					type: "bar",
+					value: "🙂 0.2",
+					width: 1,
+					x: 4,
+					y: 29,
+				},
+				{
+					color: "black",
+					height: 29,
+					type: "bar",
+					value: "🙂 -0.3",
+					width: 1,
+					x: 6,
+					y: 0,
+				},
 			];
 
 			expect(calculateBarChartItems(input)).toStrictEqual(output);
@@ -281,6 +342,39 @@ describe("calcs", () => {
 					value: "0,0",
 					x: 0,
 					y: 0,
+				},
+			];
+
+			expect(calculateScatterPlotItems(input)).toStrictEqual(output);
+		});
+
+		it("must format values if value formatter", () => {
+			const layers = [{ type, x: [0, 1], y: [0, 1] }];
+			const input = {
+				...common,
+				layers,
+				valueFormatter: ([x, y]: [x: number, y: number]) => `🙂 ${x} 😶 ${y}`,
+			};
+			const output = [
+				{
+					color,
+					defaultColor: color,
+					highlightColor: undefined,
+					size: 1,
+					type,
+					value: "🙂 0 😶 0",
+					x: 0,
+					y: 0,
+				},
+				{
+					color,
+					defaultColor: color,
+					highlightColor: undefined,
+					size: 1,
+					type,
+					value: "🙂 1 😶 1",
+					x: 48,
+					y: 48,
 				},
 			];
 
