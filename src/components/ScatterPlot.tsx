@@ -20,7 +20,7 @@ export interface ScatterPlotProps {
 
 export const ScatterPlot = memo(
 	({
-		backgroundColor = "white",
+		backgroundColor,
 		className,
 		layers,
 		max: forceMax,

@@ -106,7 +106,6 @@ export const BarChart = memo(
 			const barsLayerLength = barsLayer?.values.length ?? 0;
 
 			setup({
-				backgroundColor: "white",
 				canvas: ref.current,
 				height: canvasHeight,
 				width: (barsLayerLength - 1) * (barWidth + barGap) + barWidth,

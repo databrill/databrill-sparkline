@@ -66,7 +66,7 @@ export interface RenderScatterPlotProps {
 }
 
 export interface SetupProps {
-	readonly backgroundColor: string;
+	readonly backgroundColor?: string;
 	readonly canvas: HTMLCanvasElement | null;
 	readonly height: number;
 	readonly width: number;
@@ -159,7 +159,7 @@ export function setup(props: SetupProps): void {
 
 	canvas.setAttribute("height", `${height}px`);
 	canvas.setAttribute("width", `${width}px`);
-	canvas.style.setProperty("background-color", backgroundColor);
+	if (backgroundColor) canvas.style.setProperty("background-color", backgroundColor);
 	context.translate(0, height);
 	context.scale(1, -1);
 }
