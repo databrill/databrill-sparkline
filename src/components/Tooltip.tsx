@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 export interface TooltipProps {
 	left?: number;
 	top?: number;
-	value?: number | string;
+	value?: string;
 }
 
 export const Tooltip = memo(({ left, top, value }: TooltipProps): JSX.Element | null => {
@@ -22,6 +22,7 @@ export const Tooltip = memo(({ left, top, value }: TooltipProps): JSX.Element | 
 	return createPortal(
 		<div
 			aria-label={value ? `${value}` : undefined}
+			dangerouslySetInnerHTML={{ __html: value ?? "" }}
 			role="tooltip"
 			style={{
 				backgroundColor: "rgba(60, 60, 60, 0.75)",
@@ -35,9 +36,7 @@ export const Tooltip = memo(({ left, top, value }: TooltipProps): JSX.Element | 
 				top,
 				zIndex: 1,
 			}}
-		>
-			{value}
-		</div>,
+		/>,
 		element
 	);
 });
