@@ -52,7 +52,7 @@ export interface RenderBarChartProps {
 	readonly layers: readonly BarChartLayer[];
 	readonly min?: number;
 	readonly size: number;
-	readonly valueFormatter?: (value: number) => string;
+	readonly valueFormatter?: (value: number, index: number) => string;
 	readonly zeroColor?: string;
 }
 
@@ -62,7 +62,7 @@ export interface RenderScatterPlotProps {
 	readonly max?: [x?: number, y?: number];
 	readonly min?: [x?: number, y?: number];
 	readonly size: number;
-	readonly valueFormatter?: (value: [x: number, y: number]) => string;
+	readonly valueFormatter?: (value: [x: number, y: number], index: number) => string;
 }
 
 export interface SetupProps {

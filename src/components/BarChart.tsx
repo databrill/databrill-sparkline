@@ -17,7 +17,7 @@ export interface BarChartProps {
 	readonly layers: readonly BarChartLayer[];
 	readonly min?: number;
 	readonly size: number;
-	readonly valueFormatter?: (value: number) => string;
+	readonly valueFormatter?: (value: number, index: number) => string;
 	readonly zeroColor?: string;
 }
 

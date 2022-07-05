@@ -15,7 +15,7 @@ export interface ScatterPlotProps {
 	readonly max?: [x?: number, y?: number];
 	readonly min?: [x?: number, y?: number];
 	readonly size: number;
-	readonly valueFormatter?: (value: [x: number, y: number]) => string;
+	readonly valueFormatter?: (value: [x: number, y: number], index: number) => string;
 }
 
 export const ScatterPlot = memo(

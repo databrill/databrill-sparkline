@@ -16,7 +16,7 @@ interface CalculateBarChartItemsProps {
 	readonly canvasHeight: number;
 	readonly forceMin?: number;
 	readonly layers: readonly BarChartLayer[];
-	readonly valueFormatter?: (value: number) => string;
+	readonly valueFormatter?: (value: number, index: number) => string;
 	readonly zeroColor: string;
 }
 
@@ -25,7 +25,7 @@ interface CalculateScatterPlotItemsProps {
 	readonly forceMin?: [x?: number, y?: number];
 	readonly forceMax?: [x?: number, y?: number];
 	readonly layers: readonly ScatterPlotLayer[];
-	readonly valueFormatter?: (value: [x: number, y: number]) => string;
+	readonly valueFormatter?: (value: [x: number, y: number], index: number) => string;
 }
 
 export function calculateBarChartItems({
@@ -69,7 +69,7 @@ export function calculateBarChartItems({
 					color,
 					height: MIN_BAR_HEIGHT,
 					type,
-					value: valueFormatter?.(value) ?? `${value}`,
+					value: valueFormatter?.(value, i) ?? `${value}`,
 					width: barWidth,
 					x,
 					y,
@@ -102,7 +102,7 @@ export function calculateBarChartItems({
 					color,
 					height,
 					type,
-					value: valueFormatter?.(value) ?? `${value}`,
+					value: valueFormatter?.(value, i) ?? `${value}`,
 					width: barWidth,
 					x,
 					y,
@@ -154,7 +154,7 @@ export function calculateScatterPlotItems({
 				const xPosition = Math.round(((xValue - minX) * canvasSize) / rangeX - size / 2);
 				const yValue = layer.y[i] ?? 0;
 				const yPosition = Math.round(((yValue - minY) * canvasSize) / rangeY - size / 2);
-				const textValue = valueFormatter?.([xValue, yValue]) ?? `${xValue},${yValue}`;
+				const textValue = valueFormatter?.([xValue, yValue], i) ?? `${xValue},${yValue}`;
 
 				items.push({
 					defaultColor: color,
