@@ -128,12 +128,12 @@ export function calculateScatterPlotItems({
 	const items: ScatterPlotItem[] = [];
 	const xValues = layers.flatMap((lr) => [
 		...(xLogBase && xLogBase > 1
-			? lr.x.map((value) => (value >= 1 ? Math.log(value) / Math.log(xLogBase) : value))
+			? lr.x.flatMap((value) => (value > 0 ? [Math.log(value) / Math.log(xLogBase)] : []))
 			: lr.x),
 	]);
 	const yValues = layers.flatMap((lr) => [
 		...(yLogBase && yLogBase > 1
-			? lr.y.map((value) => (value >= 1 ? Math.log(value) / Math.log(yLogBase) : value))
+			? lr.y.flatMap((value) => (value > 0 ? [Math.log(value) / Math.log(yLogBase)] : []))
 			: lr.y),
 	]);
 	const maxX = forceMax?.[0] ?? Math.max(...xValues);
