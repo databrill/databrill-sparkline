@@ -126,51 +126,100 @@ export function calculateScatterPlotItems({
 	yLogBase,
 }: CalculateScatterPlotItemsProps): readonly ScatterPlotItem[] {
 	const items: ScatterPlotItem[] = [];
-	const xValues = layers.flatMap((lr) => [
-		...(xLogBase && xLogBase > 1
-			? lr.x.flatMap((value) => (value > 0 ? [Math.log(value) / Math.log(xLogBase)] : []))
-			: lr.x),
-	]);
-	const yValues = layers.flatMap((lr) => [
-		...(yLogBase && yLogBase > 1
-			? lr.y.flatMap((value) => (value > 0 ? [Math.log(value) / Math.log(yLogBase)] : []))
-			: lr.y),
-	]);
-	const maxX = forceMax?.[0] ?? Math.max(...xValues);
-	const minX = forceMin?.[0] ?? Math.min(...xValues);
-	const maxY = forceMax?.[1] ?? Math.max(...yValues);
-	const minY = forceMin?.[1] ?? Math.min(...yValues);
-	const rangeX = maxX - minX;
-	const rangeY = maxY - minY;
+	let xMinScaled: number = Number.MAX_VALUE;
+	let xMaxScaled: number = Number.MIN_VALUE;
+	let yMinScaled: number = Number.MAX_VALUE;
+	let yMaxScaled: number = Number.MIN_VALUE;
+	const layerDatas = layers.map((layer) => {
+		const points: {
+			readonly x: number;
+			readonly y: number;
+			readonly xScaled: number;
+			readonly yScaled: number;
+		}[] = [];
+		for (let i = 0; i < layer.x.length; i++) {
+			let ok = true;
+			const x = layer.x[i];
+			const y = layer.y[i];
+			let xScaled = x;
+			let yScaled = y;
+			if (xLogBase && xLogBase > 1) {
+				if (layer.x[i] <= 0) {
+					ok = false;
+				} else {
+					xScaled = Math.log(x) / Math.log(xLogBase);
+				}
+			}
+			if (yLogBase && yLogBase > 1) {
+				if (layer.y[i] <= 0) {
+					ok = false;
+				} else {
+					yScaled = Math.log(y) / Math.log(yLogBase);
+				}
+			}
+			if (ok) {
+				points.push({ x, y, xScaled, yScaled });
+				// Update the min and max values
+				if (x < xMinScaled) {
+					xMinScaled = xScaled;
+				}
+				if (x > xMaxScaled) {
+					xMaxScaled = xScaled;
+				}
+				if (y < yMinScaled) {
+					yMinScaled = yScaled;
+				}
+				if (y > yMaxScaled) {
+					yMaxScaled = yScaled;
+				}
+			}
+		}
+		return {
+			layer,
+			points,
+		};
+	});
+	xMinScaled = forceMin?.[0] ?? (xMinScaled !== Number.MAX_VALUE ? xMinScaled : 0);
+	xMaxScaled = forceMax?.[0] ?? (xMaxScaled !== Number.MIN_VALUE ? xMaxScaled : 0);
+	yMinScaled = forceMin?.[1] ?? (yMinScaled !== Number.MAX_VALUE ? yMinScaled : 0);
+	yMaxScaled = forceMax?.[1] ?? (yMaxScaled !== Number.MIN_VALUE ? yMaxScaled : 0);
+	const rangeX = xMaxScaled - xMinScaled;
+	const rangeY = yMaxScaled - yMinScaled;
 
-	for (const layer of layers) {
+	for (const layerData of layerDatas) {
+		const { layer, points } = layerData;
 		if (layer.type === "line") {
 			const width = layer.width ?? MIN_LINE_WIDTH;
 
-			for (let i = 0; i < xValues.length - 1; i++) {
+			for (let i = 0; i < points.length - 1; i++) {
+				const { xScaled: x0, yScaled: y0 } = points[i];
+				const { xScaled: x1, yScaled: y1 } = points[i + 1];
 				items.push({
 					color: layer.color,
-					fromX: Math.round(((xValues[i] - minX) * canvasSize) / rangeX - width / 2),
-					fromY: Math.round(((yValues[i] - minY) * canvasSize) / rangeY - width / 2),
+					fromX: Math.round(((x0 - xMinScaled) * canvasSize) / rangeX - width / 2),
+					fromY: Math.round(((y0 - yMinScaled) * canvasSize) / rangeY - width / 2),
 					strokeWidth: layer.width,
-					toX: Math.round(((xValues[i + 1] - minX) * canvasSize) / rangeX - width / 2),
-					toY: Math.round(((layer.y[i + 1] - minY) * canvasSize) / rangeY - width / 2),
+					toX: Math.round(((x1 - xMinScaled) * canvasSize) / rangeX - width / 2),
+					toY: Math.round(((y1 - yMinScaled) * canvasSize) / rangeY - width / 2),
 					type: layer.type,
 				});
 			}
 		} else {
-			for (let i = 0; i < xValues.length; i++) {
+			for (let i = 0; i < points.length; i++) {
 				const color = layer.color ?? DEFAULT_POINT_COLOR;
 				const size = layer.size ?? MIN_POINT_SIZE;
-				const xOriginalValue = layer.x[i] ?? 0;
-				const xValue = xValues[i] ?? 0;
-				const xPosition = Math.round(((xValue - minX) * canvasSize) / rangeX - size / 2);
-				const yOriginalValue = layer.y[i] ?? 0;
-				const yValue = yValues[i] ?? 0;
-				const yPosition = Math.round(((yValue - minY) * canvasSize) / rangeY - size / 2);
-				const textValue =
-					valueFormatter?.([xOriginalValue, yOriginalValue], i) ??
-					`${xOriginalValue},${yOriginalValue}`;
+				const point = points[i];
+				const xValue = point.x;
+				const xScaled = point.xScaled;
+				const xCanvas = Math.round(
+					((xScaled - xMinScaled) * canvasSize) / rangeX - size / 2
+				);
+				const yValue = point.y;
+				const yScaled = point.yScaled;
+				const yCanvas = Math.round(
+					((yScaled - yMinScaled) * canvasSize) / rangeY - size / 2
+				);
+				const textValue = valueFormatter?.([xValue, yValue], i) ?? `${xValue},${yValue}`;
 
 				items.push({
 					defaultColor: color,
@@ -179,8 +228,8 @@ export function calculateScatterPlotItems({
 					size,
 					type: layer.type,
 					value: textValue,
-					x: rangeX === 0 ? 0 : Math.abs(xPosition),
-					y: rangeY === 0 ? 0 : Math.abs(yPosition),
+					x: rangeX === 0 ? 0 : Math.abs(xCanvas),
+					y: rangeY === 0 ? 0 : Math.abs(yCanvas),
 				});
 			}
 		}
