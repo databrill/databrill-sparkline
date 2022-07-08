@@ -26,7 +26,9 @@ interface CalculateScatterPlotItemsProps {
 	readonly height: number;
 	readonly layers: readonly ScatterPlotLayer[];
 	readonly width: number;
+	readonly xClampMin?: number;
 	readonly xLogBase?: number;
+	readonly yClampMin?: number;
 	readonly yLogBase?: number;
 	readonly valueFormatter?: (value: [x: number, y: number], index: number) => string;
 }
@@ -124,7 +126,9 @@ export function calculateScatterPlotItems({
 	layers,
 	valueFormatter,
 	width,
+	xClampMin,
 	xLogBase,
+	yClampMin,
 	yLogBase,
 }: CalculateScatterPlotItemsProps): readonly ScatterPlotItem[] {
 	const items: ScatterPlotItem[] = [];
@@ -145,37 +149,53 @@ export function calculateScatterPlotItems({
 			const y = layer.y[i];
 			let xScaled = x;
 			let yScaled = y;
+
+			if (xClampMin) {
+				if (xScaled < xClampMin) {
+					xScaled = xClampMin;
+				}
+			}
+
+			if (yClampMin) {
+				if (yScaled < yClampMin) {
+					yScaled = yClampMin;
+				}
+			}
+
 			if (xLogBase && xLogBase > 1) {
-				if (layer.x[i] <= 0) {
+				if (xScaled <= 0) {
 					ok = false;
 				} else {
-					xScaled = Math.log(x) / Math.log(xLogBase);
+					xScaled = Math.log(xScaled) / Math.log(xLogBase);
 				}
 			}
+
 			if (yLogBase && yLogBase > 1) {
-				if (layer.y[i] <= 0) {
+				if (yScaled <= 0) {
 					ok = false;
 				} else {
-					yScaled = Math.log(y) / Math.log(yLogBase);
+					yScaled = Math.log(yScaled) / Math.log(yLogBase);
 				}
 			}
+
 			if (ok) {
 				points.push({ x, y, xScaled, yScaled });
 				// Update the min and max values
-				if (x < xMinScaled) {
+				if (xScaled < xMinScaled) {
 					xMinScaled = xScaled;
 				}
-				if (x > xMaxScaled) {
+				if (xScaled > xMaxScaled) {
 					xMaxScaled = xScaled;
 				}
-				if (y < yMinScaled) {
+				if (yScaled < yMinScaled) {
 					yMinScaled = yScaled;
 				}
-				if (y > yMaxScaled) {
+				if (yScaled > yMaxScaled) {
 					yMaxScaled = yScaled;
 				}
 			}
 		}
+
 		return {
 			layer,
 			points,

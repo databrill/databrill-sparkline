@@ -17,7 +17,9 @@ export interface ScatterPlotProps {
 	readonly min?: [x?: number, y?: number];
 	readonly width: number;
 	readonly valueFormatter?: (value: [x: number, y: number], index: number) => string;
+	readonly xClampMin?: number;
 	readonly xLogBase?: number;
+	readonly yClampMin?: number;
 	readonly yLogBase?: number;
 }
 
@@ -31,7 +33,9 @@ export const ScatterPlot = memo(
 		min: forceMin,
 		valueFormatter,
 		width,
+		xClampMin,
 		xLogBase,
+		yClampMin,
 		yLogBase,
 	}: ScatterPlotProps): JSX.Element => {
 		const ref = useRef<HTMLCanvasElement | null>(null);
@@ -110,11 +114,24 @@ export const ScatterPlot = memo(
 					height,
 					valueFormatter,
 					width,
+					xClampMin,
 					xLogBase,
+					yClampMin,
 					yLogBase,
 				})
 			);
-		}, [forceMax, forceMin, height, layers, valueFormatter, width, xLogBase, yLogBase]);
+		}, [
+			forceMax,
+			forceMin,
+			height,
+			layers,
+			valueFormatter,
+			width,
+			xClampMin,
+			xLogBase,
+			yClampMin,
+			yLogBase,
+		]);
 
 		return (
 			<div className={className} style={{ display: "inline-flex", position: "relative" }}>

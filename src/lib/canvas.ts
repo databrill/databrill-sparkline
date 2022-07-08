@@ -64,7 +64,9 @@ export interface RenderScatterPlotProps {
 	readonly min?: [x?: number, y?: number];
 	readonly valueFormatter?: (value: [x: number, y: number], index: number) => string;
 	readonly width: number;
+	readonly xClampMin?: number;
 	readonly xLogBase?: number;
+	readonly yClampMin?: number;
 	readonly yLogBase?: number;
 }
 
@@ -252,7 +254,9 @@ export function renderScatterPlot({
 	min: forceMin,
 	valueFormatter,
 	width,
+	xClampMin,
 	xLogBase,
+	yClampMin,
 	yLogBase,
 }: RenderScatterPlotProps): HTMLCanvasElement {
 	const canvas = document.createElement("canvas");
@@ -263,7 +267,9 @@ export function renderScatterPlot({
 		layers,
 		valueFormatter,
 		width,
+		xClampMin,
 		xLogBase,
+		yClampMin,
 		yLogBase,
 	});
 	const portal = document.getElementById("portal-root");
