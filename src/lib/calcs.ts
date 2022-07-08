@@ -182,13 +182,15 @@ export function calculateScatterPlotItems({
 				points.push({ x, y, xScaled, yScaled });
 				// Update the min and max values
 				if (xScaled < xMinScaled) {
-					xMinScaled = xScaled;
+					if (xClampMin) xMinScaled = x;
+					else xMinScaled = xScaled;
 				}
 				if (xScaled > xMaxScaled) {
 					xMaxScaled = xScaled;
 				}
 				if (yScaled < yMinScaled) {
-					yMinScaled = yScaled;
+					if (yClampMin) yMinScaled = y;
+					else yMinScaled = yScaled;
 				}
 				if (yScaled > yMaxScaled) {
 					yMaxScaled = yScaled;
