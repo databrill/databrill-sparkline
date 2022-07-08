@@ -252,6 +252,8 @@ export function renderScatterPlot({
 	min: forceMin,
 	valueFormatter,
 	width,
+	xLogBase,
+	yLogBase,
 }: RenderScatterPlotProps): HTMLCanvasElement {
 	const canvas = document.createElement("canvas");
 	const items = calculateScatterPlotItems({
@@ -261,6 +263,8 @@ export function renderScatterPlot({
 		layers,
 		valueFormatter,
 		width,
+		xLogBase,
+		yLogBase,
 	});
 	const portal = document.getElementById("portal-root");
 	const tooltip = document.createElement("div");
