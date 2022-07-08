@@ -196,7 +196,7 @@ export function renderBarChart({
 	const portal = document.getElementById("portal-root");
 	const tooltip = document.createElement("div");
 
-	setup({ backgroundColor: "white", canvas, height: canvasHeight, width: canvasWidth });
+	setup({ canvas, height: canvasHeight, width: canvasWidth });
 	tooltip.style.setProperty("background-color", "rgba(60, 60, 60, 0.75)");
 	tooltip.style.setProperty("color", "white");
 	tooltip.style.setProperty("font-size", "12px");
@@ -217,7 +217,7 @@ export function renderBarChart({
 		);
 
 		if (current) {
-			tooltip.innerHTML = current.value.toString();
+			tooltip.innerHTML = current.value;
 			tooltip.setAttribute("aria-label", current.value.toString());
 			tooltip.style.setProperty("left", `${x + 8}px`);
 			tooltip.style.setProperty("top", `${y - 16}px`);
@@ -244,7 +244,7 @@ export function renderBarChart({
 }
 
 export function renderScatterPlot({
-	backgroundColor = "white",
+	backgroundColor,
 	layers,
 	max: forceMax,
 	min: forceMin,
