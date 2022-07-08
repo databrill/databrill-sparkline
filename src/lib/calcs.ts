@@ -21,10 +21,11 @@ interface CalculateBarChartItemsProps {
 }
 
 interface CalculateScatterPlotItemsProps {
-	readonly canvasSize: number;
 	readonly forceMin?: [x?: number, y?: number];
 	readonly forceMax?: [x?: number, y?: number];
+	readonly height: number;
 	readonly layers: readonly ScatterPlotLayer[];
+	readonly width: number;
 	readonly xLogBase?: number;
 	readonly yLogBase?: number;
 	readonly valueFormatter?: (value: [x: number, y: number], index: number) => string;
@@ -117,11 +118,12 @@ export function calculateBarChartItems({
 }
 
 export function calculateScatterPlotItems({
-	canvasSize,
 	forceMax,
 	forceMin,
+	height,
 	layers,
 	valueFormatter,
+	width,
 	xLogBase,
 	yLogBase,
 }: CalculateScatterPlotItemsProps): readonly ScatterPlotItem[] {
@@ -196,11 +198,11 @@ export function calculateScatterPlotItems({
 				const { xScaled: x1, yScaled: y1 } = points[i + 1];
 				items.push({
 					color: layer.color,
-					fromX: Math.round(((x0 - xMinScaled) * canvasSize) / rangeX - width / 2),
-					fromY: Math.round(((y0 - yMinScaled) * canvasSize) / rangeY - width / 2),
+					fromX: Math.round(((x0 - xMinScaled) * width) / rangeX - width / 2),
+					fromY: Math.round(((y0 - yMinScaled) * height) / rangeY - width / 2),
 					strokeWidth: layer.width,
-					toX: Math.round(((x1 - xMinScaled) * canvasSize) / rangeX - width / 2),
-					toY: Math.round(((y1 - yMinScaled) * canvasSize) / rangeY - width / 2),
+					toX: Math.round(((x1 - xMinScaled) * width) / rangeX - width / 2),
+					toY: Math.round(((y1 - yMinScaled) * height) / rangeY - width / 2),
 					type: layer.type,
 				});
 			}
@@ -211,15 +213,11 @@ export function calculateScatterPlotItems({
 				const point = points[i];
 				const xValue = point.x;
 				const xScaled = point.xScaled;
-				const xCanvas = Math.round(
-					((xScaled - xMinScaled) * canvasSize) / rangeX - size / 2
-				);
+				const xCanvas = Math.round(((xScaled - xMinScaled) * width) / rangeX - size / 2);
 				const yValue = point.y;
 				const yScaled = point.yScaled;
-				const yCanvas = Math.round(
-					((yScaled - yMinScaled) * canvasSize) / rangeY - size / 2
-				);
-				const textValue = valueFormatter?.([xValue, yValue], i) ?? `${xValue},${yValue}`;
+				const yCanvas = Math.round(((yScaled - yMinScaled) * height) / rangeY - size / 2);
+				const textValue = valueFormatter?.([xValue, yValue], i) ?? `${xValue}, ${yValue}`;
 
 				items.push({
 					defaultColor: color,

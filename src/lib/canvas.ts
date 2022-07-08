@@ -58,11 +58,12 @@ export interface RenderBarChartProps {
 
 export interface RenderScatterPlotProps {
 	readonly backgroundColor?: string;
+	readonly height: number;
 	readonly layers: readonly ScatterPlotLayer[];
 	readonly max?: [x?: number, y?: number];
 	readonly min?: [x?: number, y?: number];
-	readonly size: number;
 	readonly valueFormatter?: (value: [x: number, y: number], index: number) => string;
+	readonly width: number;
 	readonly xLogBase?: number;
 	readonly yLogBase?: number;
 }
@@ -245,24 +246,26 @@ export function renderBarChart({
 
 export function renderScatterPlot({
 	backgroundColor,
+	height,
 	layers,
 	max: forceMax,
 	min: forceMin,
-	size: canvasSize,
 	valueFormatter,
+	width,
 }: RenderScatterPlotProps): HTMLCanvasElement {
 	const canvas = document.createElement("canvas");
 	const items = calculateScatterPlotItems({
-		canvasSize,
 		forceMax,
 		forceMin,
+		height,
 		layers,
 		valueFormatter,
+		width,
 	});
 	const portal = document.getElementById("portal-root");
 	const tooltip = document.createElement("div");
 
-	setup({ backgroundColor, canvas, height: canvasSize, width: canvasSize });
+	setup({ backgroundColor, canvas, height, width });
 	tooltip.style.setProperty("background-color", "rgba(60, 60, 60, 0.75)");
 	tooltip.style.setProperty("color", "white");
 	tooltip.style.setProperty("font-size", "12px");
@@ -288,8 +291,8 @@ export function renderScatterPlot({
 				item.type === "plot" &&
 				x >= item.x - item.size / 2 + canvasLeft &&
 				x <= item.x + item.size / 2 + canvasLeft &&
-				canvasSize + canvasTop - y >= item.y - item.size / 2 &&
-				canvasSize + canvasTop - y <= item.y + item.size / 2
+				height + canvasTop - y >= item.y - item.size / 2 &&
+				height + canvasTop - y <= item.y + item.size / 2
 		);
 
 		if (current && current.type === "plot") {

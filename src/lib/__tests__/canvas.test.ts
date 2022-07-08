@@ -89,7 +89,7 @@ describe("canvas", () => {
 	});
 
 	it("must render a scatter plot in a canvas", () => {
-		const canvas = renderScatterPlot({ layers: [], size: 64 });
+		const canvas = renderScatterPlot({ height: 64, layers: [], width: 64 });
 
 		expect(canvas).toBeDefined();
 	});

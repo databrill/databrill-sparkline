@@ -11,10 +11,11 @@ import { Tooltip, TooltipProps } from "./Tooltip";
 export interface ScatterPlotProps {
 	readonly backgroundColor?: string;
 	readonly className?: string;
+	readonly height: number;
 	readonly layers: readonly ScatterPlotLayer[];
 	readonly max?: [x?: number, y?: number];
 	readonly min?: [x?: number, y?: number];
-	readonly size: number;
+	readonly width: number;
 	readonly valueFormatter?: (value: [x: number, y: number], index: number) => string;
 	readonly xLogBase?: number;
 	readonly yLogBase?: number;
@@ -24,11 +25,12 @@ export const ScatterPlot = memo(
 	({
 		backgroundColor,
 		className,
+		height,
 		layers,
 		max: forceMax,
 		min: forceMin,
-		size: canvasSize,
 		valueFormatter,
+		width,
 		xLogBase,
 		yLogBase,
 	}: ScatterPlotProps): JSX.Element => {
@@ -49,8 +51,8 @@ export const ScatterPlot = memo(
 						item.type === "plot" &&
 						x >= item.x - item.size / 2 + canvasLeft &&
 						x <= item.x + item.size / 2 + canvasLeft &&
-						canvasSize + canvasTop - y >= item.y - item.size / 2 &&
-						canvasSize + canvasTop - y <= item.y + item.size / 2
+						height + canvasTop - y >= item.y - item.size / 2 &&
+						height + canvasTop - y <= item.y + item.size / 2
 				);
 
 				if (current && current.type === "plot") {
@@ -74,7 +76,7 @@ export const ScatterPlot = memo(
 					)
 				);
 			},
-			[canvasSize, items]
+			[height, items]
 		);
 
 		const handleMouseOut = useCallback(() => {
@@ -88,8 +90,8 @@ export const ScatterPlot = memo(
 		}, [handleMouseMove]);
 
 		useEffect(() => {
-			setup({ backgroundColor, canvas: ref.current, height: canvasSize, width: canvasSize });
-		}, [backgroundColor, canvasSize]);
+			setup({ backgroundColor, canvas: ref.current, height, width });
+		}, [backgroundColor, height, width]);
 
 		useEffect(() => {
 			clear({ canvas: ref.current });
@@ -102,16 +104,17 @@ export const ScatterPlot = memo(
 		useEffect(() => {
 			setItems(
 				calculateScatterPlotItems({
-					canvasSize,
 					forceMax,
 					forceMin,
 					layers,
+					height,
 					valueFormatter,
+					width,
 					xLogBase,
 					yLogBase,
 				})
 			);
-		}, [canvasSize, forceMax, forceMin, layers, valueFormatter, xLogBase, yLogBase]);
+		}, [forceMax, forceMin, height, layers, valueFormatter, width, xLogBase, yLogBase]);
 
 		return (
 			<div className={className} style={{ display: "inline-flex", position: "relative" }}>
